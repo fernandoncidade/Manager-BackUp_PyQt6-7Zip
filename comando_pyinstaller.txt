@@ -6,37 +6,25 @@ Execute o seguinte comando para transformar o código em um programa executável
 
 SEM ÍCONE:
 
-pyinstaller --onefile -w --hidden-import babel.numbers rascunho.py
+pyinstaller --onefile -w --hidden-import babel.numbers Gerenciador-BackUp-7Zip.py
 
 
 
 COM ÍCONE:
 
-pyinstaller --onefile -w --hidden-import babel.numbers --icon=C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\Manager-BackUp.ico rascunho.py
+pyinstaller --onefile -w --hidden-import babel.numbers --icon=C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-7Zip\icones\Manager-BackUp.ico Gerenciador-BackUp-7Zip.py
 
 
 
 COM ÍCONE + ÍCONES DOS BOTÕES + ÍCONE TÍTULO GUI (Pasta dos Ícones Dentro do Diretório do Código Fonte):
 
-pyinstaller --onefile -w --hidden-import babel.numbers --icon=C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\icones\Manager-BackUp.ico --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\icones\Manager-BackUp.ico:icones --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\icones\winrar3.png:icones --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\icones\winzip4.png:icones --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\icones\sevenzip4.png:icones --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\icones\tar1.png:icones --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\icones\extracao4.png:icones rascunho.py
+pyinstaller --onefile -w --hidden-import babel.numbers --icon=C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-7Zip\icones\Manager-BackUp.ico --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-7Zip\icones\Manager-BackUp.ico:icones --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-7Zip\icones\winrar3.png:icones --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-7Zip\icones\winzip4.png:icones --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-7Zip\icones\sevenzip4.png:icones --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-7Zip\icones\tar1.png:icones --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-7Zip\icones\extracao4.png:icones Gerenciador-BackUp-7Zip.py
 
 
 
 COM ÍCONE + COM EXECUTÁVEIS EXTERNOS NA RAIZ + ÍCONES DOS BOTÕES + ÍCONE TÍTULO GUI (Pasta dos Ícones Dentro do Diretório do Código Fonte):
 
-pyinstaller --onefile -w --hidden-import babel.numbers --icon=C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\icones\Manager-BackUp.ico --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\icones\Manager-BackUp.ico:icones --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\icones\winrar3.png:icones --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\icones\winzip4.png:icones --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\icones\sevenzip4.png:icones --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\icones\tar1.png:icones --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\icones\extracao4.png:icones --add-binary="C:\Program Files\7-Zip\7zG.exe;." --add-binary="C:\Program Files\WinRAR\WinRAR.exe;." "Gerenciador BackUp-7Zip.py"
-
-pyinstaller --onefile -w --hidden-import babel.numbers --icon=C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\icones\Manager-BackUp.ico --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\icones\Manager-BackUp.ico:icones --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\icones\winrar3.png:icones --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\icones\winzip4.png:icones --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\icones\sevenzip4.png:icones --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\icones\tar1.png:icones --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\icones\extracao4.png:icones --add-binary="C:\Program Files\7-Zip\7zG.exe;." --add-binary="C:\Program Files\WinRAR\WinRAR.exe;." Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip_v.1.0.py
-
-pyinstaller --onefile -w --hidden-import babel.numbers --icon=C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\icones\Manager-BackUp.ico --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\icones\Manager-BackUp.ico:icones --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\icones\winrar3.png:icones --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\icones\winzip4.png:icones --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\icones\sevenzip4.png:icones --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\icones\tar1.png:icones --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\icones\extracao4.png:icones --add-binary="C:\Program Files\7-Zip\7zG.exe;." --add-binary="C:\Program Files\WinRAR\WinRAR.exe;." Manager-BackUp-Grid-Dark.py
-
-pyinstaller --onefile -w --hidden-import babel.numbers --icon=C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\icones\Manager-BackUp.ico --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\icones\Manager-BackUp.ico:icones --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\icones\winrar3.png:icones --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\icones\winzip4.png:icones --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\icones\sevenzip4.png:icones --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\icones\tar1.png:icones --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\icones\extracao4.png:icones --add-binary="C:\Program Files\7-Zip\7zG.exe;." --add-binary="C:\Program Files\WinRAR\WinRAR.exe;." Manager-BackUp-Grid-Light.py
-
-pyinstaller --onefile -w --hidden-import babel.numbers --icon=C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\icones\Manager-BackUp.ico --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\icones\Manager-BackUp.ico:icones --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\icones\winrar3.png:icones --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\icones\winzip4.png:icones --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\icones\sevenzip4.png:icones --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\icones\tar1.png:icones --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\icones\extracao4.png:icones --add-binary="C:\Program Files\7-Zip\7zG.exe;." --add-binary="C:\Program Files\WinRAR\WinRAR.exe;." Manager-BackUp-Grid-Standart.py
-
-pyinstaller --onefile -w --hidden-import babel.numbers --icon=C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\icones\Manager-BackUp.ico --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\icones\Manager-BackUp.ico:icones --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\icones\winrar3.png:icones --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\icones\winzip4.png:icones --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\icones\sevenzip4.png:icones --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\icones\tar1.png:icones --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\icones\extracao4.png:icones --add-binary="C:\Program Files\7-Zip\7zG.exe;." --add-binary="C:\Program Files\WinRAR\WinRAR.exe;." Manager-BackUp-Grid-Themes-Multiple_Test-7Zip-WinRAR.py
-
-pyinstaller --onefile -w --hidden-import babel.numbers --icon=C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\icones\Manager-BackUp.ico --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\icones\Manager-BackUp.ico:icones --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\icones\winrar3.png:icones --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\icones\winzip4.png:icones --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\icones\sevenzip4.png:icones --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\icones\tar1.png:icones --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\icones\extracao4.png:icones --add-binary="C:\Program Files\7-Zip\7zG.exe;." --add-binary="C:\Program Files\WinRAR\WinRAR.exe;." Manager-BackUp-Grid-Themes-Multiple_Test-7Zip.py
+pyinstaller --onefile -w --hidden-import babel.numbers --icon=C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-7Zip\icones\Manager-BackUp.ico --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-7Zip\icones\Manager-BackUp.ico:icones --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-7Zip\icones\winrar3.png:icones --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-7Zip\icones\winzip4.png:icones --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-7Zip\icones\sevenzip4.png:icones --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-7Zip\icones\tar1.png:icones --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-7Zip\icones\extracao4.png:icones --add-binary="C:\Program Files\7-Zip\7zG.exe;." Gerenciador-BackUp-7Zip.py
 
 
 
@@ -52,57 +40,20 @@ ou (incluindo as dependências instaladas por terceiros):
 pip freeze > requirements.txt
 
 
-
-"C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\Gerenciador BackUp-7Zip.py"
-
-"C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip_v.1.0.py"
-
-"C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\Manager-BackUp-Grid-Dark.py"
-
-"C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\Manager-BackUp-Grid-Light.py"
-
-"C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\Manager-BackUp-Grid-Standart.py"
-
-"C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\Manager-BackUp-Grid-Themes-Multiple_Test-7Zip-WinRAR.py"
-
-"C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\Manager-BackUp-Grid-Themes-Multiple_Test-7Zip.py"
-
-"C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\rascunho1.py"
-
-"C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\rascunho2.py"
-
-
-
-"C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\icones\Manager-BackUp.ico"
-
-"C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\icones\extracao1.png"
-
-"C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\icones\extracao2.png"
-
-"C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\icones\extracao3.png"
-
-"C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\icones\extracao4.png"
-
-"C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\icones\sevenzip1.png"
-
-"C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\icones\sevenzip2.png"
-
-"C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\icones\sevenzip4.png"
-
-"C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\icones\sevenzip3.png"
-
-"C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\icones\winzip4.png"
-
-"C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\icones\tar1.png"
-
-"C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\icones\winrar1.png"
-
-"C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\icones\winrar2.png"
-
-"C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\icones\winrar3.png"
-
-"C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\icones\winzip1.png"
-
-"C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\icones\winzip2.png"
-
-"C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-WinRAR-7Zip\icones\winzip3.png"
+"C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-7Zip\icones\extracao1.png"
+"C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-7Zip\icones\extracao2.png"
+"C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-7Zip\icones\extracao3.png"
+"C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-7Zip\icones\extracao4.png"
+"C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-7Zip\icones\Manager-BackUp.ico"
+"C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-7Zip\icones\sevenzip1.png"
+"C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-7Zip\icones\sevenzip2.png"
+"C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-7Zip\icones\sevenzip3.png"
+"C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-7Zip\icones\sevenzip4.png"
+"C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-7Zip\icones\tar1.png"
+"C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-7Zip\icones\winrar1.png"
+"C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-7Zip\icones\winrar2.png"
+"C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-7Zip\icones\winrar3.png"
+"C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-7Zip\icones\winzip1.png"
+"C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-7Zip\icones\winzip2.png"
+"C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-7Zip\icones\winzip3.png"
+"C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-7Zip\icones\winzip4.png"
