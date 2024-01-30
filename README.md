@@ -1,0 +1,2 @@
+# Manager-BackUp_Multi-Thread-Grid_PyQt6-7Zip
+ Este código Python tem como finalidade, gerenciar o backup de arquivos e documentos para multiplos diretórios de destino. O backup é efetuado por meio de empacotamento sem compressão em três formatos de extensões como saída (ZIP, 7Z e TAR), tendo como motor o aplicativo 7-Zip, em específico o aplicativo 7zg.exe. É possível escolher um tema de cor para a interface gráfica dentre dez temas disponíveis.
