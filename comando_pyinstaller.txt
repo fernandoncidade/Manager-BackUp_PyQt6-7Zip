@@ -18,13 +18,13 @@ pyinstaller --onefile -w --hidden-import babel.numbers --icon=C:\Users\ferna\Pro
 
 COM ÍCONE + ÍCONES DOS BOTÕES + ÍCONE TÍTULO GUI (Pasta dos Ícones Dentro do Diretório do Código Fonte):
 
-pyinstaller --onefile -w --hidden-import babel.numbers --icon=C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-7Zip\icones\Manager-BackUp.ico --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-7Zip\icones\Manager-BackUp.ico:icones --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-7Zip\icones\winrar3.png:icones --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-7Zip\icones\winzip4.png:icones --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-7Zip\icones\sevenzip4.png:icones --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-7Zip\icones\tar1.png:icones --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-7Zip\icones\extracao4.png:icones Gerenciador-BackUp-7Zip.py
+pyinstaller --onefile -w --hidden-import babel.numbers --icon=C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-7Zip\icones\Manager-BackUp.ico --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-7Zip\icones\Manager-BackUp.ico:icones --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-7Zip\icones\winrar3.png:icones --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-7Zip\icones\winzip4.png:icones --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-7Zip\icones\sevenzip4.png:icones --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-7Zip\icones\tar1.png:icones --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-7Zip\icones\extracao4.png:icones --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-7Zip\icones\clear_button3.png:icones --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-7Zip\icones\clear_button2.png:icones Gerenciador-BackUp-7Zip.py
 
 
 
 COM ÍCONE + COM EXECUTÁVEIS EXTERNOS NA RAIZ + ÍCONES DOS BOTÕES + ÍCONE TÍTULO GUI (Pasta dos Ícones Dentro do Diretório do Código Fonte):
 
-pyinstaller --onefile -w --hidden-import babel.numbers --icon=C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-7Zip\icones\Manager-BackUp.ico --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-7Zip\icones\Manager-BackUp.ico:icones --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-7Zip\icones\winrar3.png:icones --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-7Zip\icones\winzip4.png:icones --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-7Zip\icones\sevenzip4.png:icones --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-7Zip\icones\tar1.png:icones --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-7Zip\icones\extracao4.png:icones --add-binary="C:\Program Files\7-Zip\7zG.exe;." Gerenciador-BackUp-7Zip.py
+pyinstaller --onefile -w --hidden-import babel.numbers --icon=C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-7Zip\icones\Manager-BackUp.ico --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-7Zip\icones\Manager-BackUp.ico:icones --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-7Zip\icones\winrar3.png:icones --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-7Zip\icones\winzip4.png:icones --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-7Zip\icones\sevenzip4.png:icones --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-7Zip\icones\tar1.png:icones --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-7Zip\icones\extracao4.png:icones --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-7Zip\icones\clear_button3.png:icones --add-data C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-7Zip\icones\clear_button2.png:icones --add-binary="C:\Program Files\7-Zip\7zG.exe;." Gerenciador-BackUp-7Zip.py
 
 
 
@@ -40,7 +40,7 @@ ou (incluindo as dependências instaladas por terceiros):
 pip freeze > requirements.txt
 
 
-"C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-7Zip\icones\extracao1.png"
+
 "C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-7Zip\icones\extracao2.png"
 "C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-7Zip\icones\extracao3.png"
 "C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-7Zip\icones\extracao4.png"
@@ -57,3 +57,8 @@ pip freeze > requirements.txt
 "C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-7Zip\icones\winzip2.png"
 "C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-7Zip\icones\winzip3.png"
 "C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-7Zip\icones\winzip4.png"
+"C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-7Zip\icones\clear_button1.png"
+"C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-7Zip\icones\clear_button2.png"
+"C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-7Zip\icones\clear_button3.png"
+"C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-7Zip\icones\clear_button4.png"
+"C:\Users\ferna\Project_Development\Projects_Python\Manager-BackUp_Multi-Thread-Grid_PyQt6-7Zip\icones\extracao1.png"

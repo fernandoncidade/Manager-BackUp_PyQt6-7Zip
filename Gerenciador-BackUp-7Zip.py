@@ -2,7 +2,7 @@ import os
 import sys
 import subprocess
 from PyQt6.QtWidgets import (QApplication, QMainWindow, QVBoxLayout, QHBoxLayout, QLabel, QListWidget, QPushButton,
-                             QFileDialog, QWidget, QTreeView, QMessageBox)
+                             QFileDialog, QWidget, QTreeView, QMessageBox, QMenu)
 from PyQt6.QtCore import Qt, QThread, pyqtSignal
 from PyQt6.QtGui import QAction
 from PyQt6 import QtGui
@@ -34,13 +34,14 @@ def buscar_sevenzip_executavel():
 class CompressaoCentral(QThread):
     finished = pyqtSignal()
 
-    def __init__(self, sevenzip_executable, output_listbox, folder_listbox,
+    def __init__(self, sevenzip_executable, output_listbox, folder_listbox, compression_method=None,
                  compress_as_zip=False, compress_as_7z=False, compress_as_tar=False):
 
         super().__init__()
         self.sevenzip_executable = sevenzip_executable
         self.output_listbox = output_listbox
         self.folder_listbox = folder_listbox
+        self.compression_method = compression_method
         self.compress_as_zip = compress_as_zip
         self.compress_as_7z = compress_as_7z
         self.compress_as_tar = compress_as_tar
@@ -59,13 +60,13 @@ class CompressaoCentral(QThread):
             for output_path in output_paths:
                 if self.compress_as_zip:
                     compressed_file_zip = os.path.join(output_path, f"{folder_name}.zip")
-                    command = f'"{self.sevenzip_executable}" a -r -tzip -mx=0 "{compressed_file_zip}" "{folder_path}"'
+                    command = f'"{self.sevenzip_executable}" a -r -tzip -mx={self.compression_method} "{compressed_file_zip}" "{folder_path}"'
                     subprocess.run(command, shell=True)
                     compressed_files.append(compressed_file_zip)
 
                 elif self.compress_as_7z:
                     compressed_file_7z = os.path.join(output_path, f"{folder_name}.7z")
-                    command = f'"{self.sevenzip_executable}" a -r -t7z -mx=0 "{compressed_file_7z}" "{folder_path}"'
+                    command = f'"{self.sevenzip_executable}" a -r -t7z -mx={self.compression_method} "{compressed_file_7z}" "{folder_path}"'
                     subprocess.run(command, shell=True)
                     compressed_files.append(compressed_file_7z)
                     
@@ -171,7 +172,22 @@ class PastaAppEmapacotamento(QMainWindow):
 
         # Cria a barra de menus
         self.menu_bar = self.menuBar()
-        
+
+        # Criar menu de configurações
+        self.config_menu = self.menu_bar.addMenu('Configurações')
+
+            # Adicionar ação para selecionar método de compressão
+        self.compression_method_action = QAction('Selecionar Método de Compressão', self)
+        self.compression_method_action.triggered.connect(self.select_compression_method)
+        self.config_menu.addAction(self.compression_method_action)
+            # Definir variáveis para armazenar o método de compressão selecionado para cada tipo
+        self.compression_method_rar = None
+        self.compression_method_zip = None
+        self.compression_method_7z = None
+        self.compression_method_tar = None
+            # Adiciona evento de entrada e saída para ativar o menu
+        self.config_menu.aboutToShow.connect(self.select_compression_method)
+
         # Cria o menu de temas
         self.theme_menu = self.menu_bar.addMenu('Temas')
 
@@ -333,6 +349,7 @@ class PastaAppEmapacotamento(QMainWindow):
         self.setStyleSheet("""
         QPushButton {
             min-width: 14em;
+            max-width: 14em;
             padding: 2px;
         }
         QListWidget {
@@ -355,6 +372,7 @@ class PastaAppEmapacotamento(QMainWindow):
             border-color: #b3b3b3;
             font: bold 12px;
             min-width: 14em;
+            max-width: 14em;
             padding: 2px;
             color: #333333;
         }
@@ -388,6 +406,7 @@ class PastaAppEmapacotamento(QMainWindow):
             border-color: #1e1e1e;
             font: bold 12px;
             min-width: 14em;
+            max-width: 14em;
             padding: 2px;
             color: #b3b3b3;
         }
@@ -421,6 +440,7 @@ class PastaAppEmapacotamento(QMainWindow):
             border-color: #1a3348;
             font: bold 12px;
             min-width: 14em;
+            max-width: 14em;
             padding: 2px;
             color: #ffffff;
         }
@@ -454,6 +474,7 @@ class PastaAppEmapacotamento(QMainWindow):
             border-color: #4d1a1a;
             font: bold 12px;
             min-width: 14em;
+            max-width: 14em;
             padding: 2px;
             color: #ffffff;
         }
@@ -487,6 +508,7 @@ class PastaAppEmapacotamento(QMainWindow):
             border-color: #1a4d33;
             font: bold 12px;
             min-width: 14em;
+            max-width: 14em;
             padding: 2px;
             color: #ffffff;
         }
@@ -520,6 +542,7 @@ class PastaAppEmapacotamento(QMainWindow):
             border-color: #331a4d;
             font: bold 12px;
             min-width: 14em;
+            max-width: 14em;
             padding: 2px;
             color: #ffffff;
         }
@@ -553,6 +576,7 @@ class PastaAppEmapacotamento(QMainWindow):
             border-color: #993d00;
             font: bold 12px;
             min-width: 14em;
+            max-width: 14em;
             padding: 2px;
             color: #ffffff;
         }
@@ -586,6 +610,7 @@ class PastaAppEmapacotamento(QMainWindow):
             border-color: #99993d;
             font: bold 12px;
             min-width: 14em;
+            max-width: 14em;
             padding: 2px;
             color: #333333;
         }
@@ -619,6 +644,7 @@ class PastaAppEmapacotamento(QMainWindow):
             border-color: #993d7a;
             font: bold 12px;
             min-width: 14em;
+            max-width: 14em;
             padding: 2px;
             color: #ffffff;
         }
@@ -667,9 +693,13 @@ class PastaAppEmapacotamento(QMainWindow):
         primeiro_quadrante_layout.addWidget(test_button)
 
         clear_button_folders = QPushButton("Limpar Entrada")
+        limpar_folders_icon_path = os.path.join(icon_path, "clear_button3.png")
+        clear_button_folders.setIcon(QtGui.QIcon(limpar_folders_icon_path))
         clear_button_folders.clicked.connect(self.clear_folders)
         primeiro_quadrante_layout.addWidget(clear_button_folders)
-        clear_button_output = QPushButton("Limpar Saída")
+        clear_button_output = QPushButton("Limpar Saídas")
+        limpar_output_icon_path = os.path.join(icon_path, "clear_button2.png")
+        clear_button_output.setIcon(QtGui.QIcon(limpar_output_icon_path))
         clear_button_output.clicked.connect(self.clear_output)
         primeiro_quadrante_layout.addWidget(clear_button_output)
 
@@ -819,6 +849,8 @@ class PastaAppEmapacotamento(QMainWindow):
 
         self.apply_neutral_standart_theme()
 
+        self.change_theme(theme='Tema Neutro Padrão')
+
     def browse_folder(self):
         folder_dialog = QFileDialog(self, "Selecionar Pastas")
         folder_dialog.setFileMode(QFileDialog.FileMode.Directory)
@@ -922,23 +954,72 @@ class PastaAppEmapacotamento(QMainWindow):
     def output_button_output_EXTRACT_clicked(self):
         self.select_output_path(self.output_listbox_extract)
 
+    def select_compression_method(self):
+        legends_sevenzip = {
+            "0": "0 - Armazena sem compressão",
+            "1": "1 - Mais Rápido",
+            "3": "3 - Rápido",
+            "5": "5 - Normal",
+            "7": "7 - Máximo",
+            "9": "9 - Ultra"
+        }
+
+        compression_menu = QMenu(self)
+
+        sevenzip_submenu = QMenu("7-Zip", self)
+        sevenzip_methods = ["0", "1", "3", "5", "7", "9"]
+        for method in sevenzip_methods:
+            action = QAction(legends_sevenzip[method], self)
+            # Para 7z
+            action.triggered.connect(lambda checked, method=method: self.set_compression_method(method, '7z'))
+            # Para zip
+            action.triggered.connect(lambda checked, method=method: self.set_compression_method(method, 'zip'))
+            # Para tar
+            action.triggered.connect(lambda checked, method=method: self.set_compression_method(method, 'tar'))
+            sevenzip_submenu.addAction(action)
+        compression_menu.addMenu(sevenzip_submenu)
+
+        self.compression_method_action.setMenu(compression_menu)
+
+    def set_compression_method(self, method, compress_type):
+        if compress_type == 'rar':
+            self.compression_method_rar = method
+        elif compress_type == 'zip':
+            self.compression_method_zip = method
+        elif compress_type == '7z':
+            self.compression_method_7z = method
+        elif compress_type == 'tar':
+            self.compression_method_tar = method
+
     def store_as_zip(self):
-        self.compress_thread = CompressaoCentral(
-            self.sevenzip_executable, self.output_listbox_zip, self.folder_listbox, compress_as_zip=True)
-        self.compress_thread.finished.connect(self.on_compress_finished)
-        self.compress_thread.start()
+        if self.compression_method_zip is not None:
+            self.compress_thread = CompressaoCentral(
+                self.sevenzip_executable, self.output_listbox_zip, self.folder_listbox,
+                compress_as_zip=True, compression_method=self.compression_method_zip)
+            self.compress_thread.finished.connect(self.on_compress_finished)
+            self.compress_thread.start()
+        else:
+            QMessageBox.warning(self, "Aviso", "Por favor, selecione um método de compressão antes de prosseguir.")
 
     def store_as_7z(self):
-        self.compress_thread = CompressaoCentral(
-            self.sevenzip_executable, self.output_listbox_7z, self.folder_listbox, compress_as_7z=True)
-        self.compress_thread.finished.connect(self.on_compress_finished)
-        self.compress_thread.start()
+        if self.compression_method_7z is not None:
+            self.compress_thread = CompressaoCentral(
+                self.sevenzip_executable, self.output_listbox_7z, self.folder_listbox,
+                compress_as_7z=True, compression_method=self.compression_method_7z)
+            self.compress_thread.finished.connect(self.on_compress_finished)
+            self.compress_thread.start()
+        else:
+            QMessageBox.warning(self, "Aviso", "Por favor, selecione um método de compressão antes de prosseguir.")
 
     def store_as_tar(self):
-        self.compress_thread = CompressaoCentral(
-            self.sevenzip_executable, self.output_listbox_tar, self.folder_listbox, compress_as_tar=True)
-        self.compress_thread.finished.connect(self.on_compress_finished)
-        self.compress_thread.start()
+        if self.compression_method_tar is not None:
+            self.compress_thread = CompressaoCentral(
+                self.sevenzip_executable, self.output_listbox_tar, self.folder_listbox,
+                compress_as_tar=True, compression_method=self.compression_method_tar)
+            self.compress_thread.finished.connect(self.on_compress_finished)
+            self.compress_thread.start()
+        else:
+            QMessageBox.warning(self, "Aviso", "Por favor, selecione um método de compressão antes de prosseguir.")
 
     def testar_integridade(self):
         selected_files = [self.folder_listbox.item(idx).text() for idx in range(self.folder_listbox.count())]
