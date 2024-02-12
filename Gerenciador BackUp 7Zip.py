@@ -212,14 +212,14 @@ class PastaAppEmapacotamento(QMainWindow):
         self.output_listbox_extract = QListWidget()
         self.compressed_files = []
 
-        self.compress_thread = CompressaoZIP(self.sevenzip_executable, self.output_listbox, self.folder_listbox)
-        self.compress_thread.finished.connect(self.on_compress_finished)
+        self.compress_thread_zip = CompressaoZIP(self.sevenzip_executable, self.output_listbox, self.folder_listbox)
+        self.compress_thread_zip.finished.connect(self.on_compress_finished)
 
-        self.compress_thread = Compressao7Z(self.sevenzip_executable, self.output_listbox, self.folder_listbox)
-        self.compress_thread.finished.connect(self.on_compress_finished)
+        self.compress_thread_7z = Compressao7Z(self.sevenzip_executable, self.output_listbox, self.folder_listbox)
+        self.compress_thread_7z.finished.connect(self.on_compress_finished)
 
-        self.compress_thread = CompressaoTAR(self.sevenzip_executable, self.output_listbox, self.folder_listbox)
-        self.compress_thread.finished.connect(self.on_compress_finished)
+        self.compress_thread_tar = CompressaoTAR(self.sevenzip_executable, self.output_listbox, self.folder_listbox)
+        self.compress_thread_tar.finished.connect(self.on_compress_finished)
 
         self.teste_integridade_thread = TesteIntegridadeCentral(self.sevenzip_executable, self.compressed_files)
         self.teste_integridade_thread.finished.connect(self.on_teste_integridade_finished)
