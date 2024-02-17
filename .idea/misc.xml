@@ -3,5 +3,5 @@
   <component name="Black">
     <option name="sdkName" value="Python 3.12 (Manager-BackUp_Multi-Thread-Grid_PyQt6-7Zip)" />
   </component>
-  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.12 (Manager-BackUp_Multi-Thread-Grid_PyQt6-7Zip)" project-jdk-type="Python SDK" />
+  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.12 (Manager-BackUp_PyQt6-7Zip)" project-jdk-type="Python SDK" />
 </project>
