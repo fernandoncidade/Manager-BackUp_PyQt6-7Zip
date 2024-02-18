@@ -238,7 +238,6 @@ class PastaAppEmapacotamento(QMainWindow):
         self.compression_method_action.triggered.connect(self.select_compression_method)
         self.config_menu.addAction(self.compression_method_action)
         # Definir variáveis para armazenar o método de compressão selecionado para cada tipo
-        self.compression_method_rar = None
         self.compression_method_zip = None
         self.compression_method_7z = None
         self.compression_method_tar = None
@@ -726,7 +725,7 @@ class PastaAppEmapacotamento(QMainWindow):
         # Adicione a pasta "icones" ao caminho base
         icon_path = os.path.join(base_path, "icones")
 
-        self.setWindowTitle("Gerenciador de BackUp-7Zip")
+        self.setWindowTitle("Gerenciador de BackUp")
         icon_title_path = os.path.join(icon_path, "Manager-BackUp.ico")
         self.setWindowIcon(QtGui.QIcon(icon_title_path))
 
@@ -931,7 +930,6 @@ class PastaAppEmapacotamento(QMainWindow):
         file_dialog = QFileDialog(self, "Selecionar Arquivos")
         file_dialog.setFileMode(QFileDialog.FileMode.ExistingFiles)
         file_dialog.setNameFilter("Todos os Arquivos (*.*)")
-        # file_dialog.setNameFilter("Arquivos Compactados (*.rar *.zip *.7z *.tar)")
         file_dialog.setOption(QFileDialog.Option.ReadOnly, True)
         file_dialog.setOption(QFileDialog.Option.HideNameFilterDetails, True)
         file_dialog.setOption(QFileDialog.Option.DontUseNativeDialog, True)
@@ -1095,7 +1093,7 @@ class PastaAppEmapacotamento(QMainWindow):
             self.extract_thread.finished.connect(self.on_extract_finished)
             self.extract_thread.start()
         else:
-            print("Nenhum programa (WinRAR ou 7-Zip) encontrado para extração.")
+            print("7-Zip não encontrado para extração.")
 
     def on_compress_finished(self):
         msg_box = QMessageBox()
