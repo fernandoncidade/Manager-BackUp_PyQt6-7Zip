@@ -4,7 +4,7 @@ import subprocess  # Importa o módulo subprocess
 # Importa as classes QApplication, QMainWindow, QVBoxLayout, QHBoxLayout, QLabel, QListWidget, QPushButton, ...
 # QFileDialog, QWidget, QTreeView, QMessageBox, QMenu do módulo QtWidgets
 from PyQt6.QtWidgets import (QApplication, QMainWindow, QVBoxLayout, QHBoxLayout, QLabel, QListWidget, QPushButton,
-                             QFileDialog, QWidget, QTreeView, QMessageBox, QMenu)
+                             QFileDialog, QWidget, QTreeView, QMessageBox, QMenu, QStyleFactory)
 # Importa as classes Qt, QThread, pyqtSignal do módulo QtCore
 from PyQt6.QtCore import Qt, QThread, pyqtSignal
 # Importa a classe QAction do módulo QtGui
@@ -12,8 +12,6 @@ from PyQt6.QtGui import QAction
 # Importa a classe QtGui do módulo PyQt6
 from PyQt6 import QtGui
 
-
-### AS LINHAS DE COMENTÁRIO SEMPRE FARÃO REFERÊNCIA A LINHA DE CÓDIGO QUE AS SUSCEDE, LOGO ABAIXO ###
 
 # Define a função de chamada, que busca o executável. Essa função não recebe nenhum argumento.
 def buscar_sevenzip_executavel():
@@ -31,7 +29,7 @@ def buscar_sevenzip_executavel():
         return caminho_sevenzip
 
     # Esta linha define uma lista de possíveis localizações para o executável do 7-Zip.
-    # Essas localizações são caminhos absolutos para os diretórios onde o 7-Zip pode estar instalado.
+    # Essas localizações são caminhos absolutos para os diretórios onde o WinRAR pode estar instalado.
     possible_locations = [
         rf"C:\Program Files\7-Zip\7zG.exe",
         rf"C:\Program Files (x86)\7-Zip\7zG.exe",
@@ -42,7 +40,7 @@ def buscar_sevenzip_executavel():
         if os.path.isfile(location):
             return location
 
-    # Se o arquivo do executável do 7-Zip não for encontrado em nenhuma das localizações, ...
+    # Se o arquivo do executável do WinRAR não for encontrado em nenhuma das localizações, ...
     # esta linha retorna None, indicando que o executável não foi encontrado.
     return None
 
@@ -52,9 +50,9 @@ class CompressaoZIP(QThread):
     # Define um sinal chamado finished que pode ser emitido quando a thread terminar.
     finished = pyqtSignal()
 
-    # Esta linha define o método especial __init__, que é o construtor da classe.
+    #Esta linha define o método especial __init__, que é o construtor da classe.
     # Ele é chamado quando um novo objeto da classe é criado.
-    # O construtor recebe vários parâmetros: sevenzip_executable, output_listbox, folder_listbox, compress_as_zip e compression_method.
+    # O construtor recebe vários parâmetros: sevenzip_executable, output_listbox, folder_listbox, compress_as_rar e compression_method.
     def __init__(self, sevenzip_executable, output_listbox, folder_listbox, compress_as_zip=False, compression_method=None):
 
         # Esta linha chama o construtor da classe pai.
@@ -97,10 +95,10 @@ class CompressaoZIP(QThread):
                 # Nesta linha, o caminho completo do arquivo comprimido é construído usando a função join do módulo os.
                 # O caminho de saída e o nome da pasta são combinados com a extensão .rar para formar o caminho completo do arquivo comprimido.
                 # O caminho é armazenado na variável compressed_file_zip.
-                compressed_file_zip = os.path.join(output_path, f"{folder_name}.zip")
+                compressed_file_zip = os.path.join(output_path, f"{folder_name}.rar")
                 # Aqui, uma string command é construída para representar o comando que será executado para comprimir a pasta.
-                # O comando inclui o executável do 7-Zip, opções de compressão e os caminhos do arquivo comprimido e da pasta.
-                command = f'"{self.sevenzip_executable}" a -r -tzip -mx={self.compression_method} "{compressed_file_zip}" "{folder_path}"'
+                # O comando inclui o executável do WinRAR, opções de compressão e os caminhos do arquivo comprimido e da pasta.
+                command = f'"{self.winrar_executable}" a -r -ep1 -m{self.compression_method} -md1024 -afrar -o+ "{compressed_file_zip}" "{folder_path}"'
                 # Nesta linha, o comando construído anteriormente é executado usando o módulo subprocess.
                 # O parâmetro shell=True indica que o comando deve ser executado em um shell.
                 subprocess.run(command, shell=True)
@@ -175,7 +173,6 @@ class CompressaoTAR(QThread):
 
         self.finished.emit()
 
-
 # Define uma nova classe chamada TesteIntegridade que herda de QThread, uma classe do PyQt que permite a criação de threads.
 class TesteIntegridade(QThread):
     # Define um sinal chamado finished que pode ser emitido quando a thread terminar.
@@ -197,7 +194,7 @@ class TesteIntegridade(QThread):
     # Define o método run, que é chamado quando a thread é iniciada. Este método não recebe argumentos além de self.
     def run(self):
         # Inicia um loop que itera sobre cada arquivo na lista de arquivos comprimidos.
-        for compressed_file in self.compressed_files:
+        for compressed_file in self.compressed_files:                
             # Verifica se o nome do arquivo termina com ".zip", indicando que é um arquivo ZIP.
             if compressed_file.endswith(".zip"):
                 # Define o comando que será executado para verificar a integridade do arquivo.
@@ -240,7 +237,7 @@ class Extracao(QThread):
     # Define o método inicializador da classe, que é chamado quando um objeto da classe é criado.
     # Ele recebe cinco argumentos:
     # self (uma referência ao objeto sendo criado);
-    # sevenzip_executable (o caminho para o executável do 7-Zip);
+    # sevenzip_executable (o caminho para o executável do 7zip);
     # output_listbox (um objeto ListBox que contém os caminhos de saída);
     # e folder_listbox (um objeto ListBox que contém os caminhos dos arquivos a serem extraídos).
     def __init__(self, sevenzip_executable, output_listbox, folder_listbox):
@@ -271,7 +268,7 @@ class Extracao(QThread):
                 # Verifica se o nome do arquivo termina com ".zip", indicando que é um arquivo RAR.
                 if archive_path.endswith(".zip"):
                     # Define o comando que será executado para extrair o arquivo.
-                    # O comando usa o executável do 7-Zip e o nome do arquivo.
+                    # O comando usa o executável do 7Zip e o nome do arquivo.
                     command = f'"{self.sevenzip_executable}" x -y "{archive_path}" -o"{output_path}"'
                     # Executa o comando definido na linha anterior.
                     # O argumento shell=True permite que o comando seja executado em um shell.
@@ -286,8 +283,6 @@ class Extracao(QThread):
                     subprocess.run(command, shell=True)
 
                 elif archive_path.endswith(".tar"):
-                    # Define o comando que será executado para extrair o arquivo.
-                    # O comando usa o executável do 7zip e o nome do arquivo.
                     command = f'"{self.sevenzip_executable}" x -y "{archive_path}" -o"{output_path}"'
                     # Executa o comando definido na linha anterior.
                     # O argumento shell=True permite que o comando seja executado em um shell.
@@ -300,35 +295,37 @@ class Extracao(QThread):
 # Define uma nova classe chamada GerenciadorInterface que herda de QThread, uma classe do PyQt que permite a criação de threads.
 class GerenciadorInterface(QThread):
     # Define o método inicializador da classe, que é chamado quando um objeto da classe é criado.
-    def __init__(self):
+    def __init__(self, main_window):
         # Chama o método inicializador da classe pai (QThread), que é necessário para a correta inicialização da thread.
         super().__init__()
+        self.main_window = main_window
 
-        # Definir variáveis para armazenar o método de compressão selecionado para cada tipo de arquivo.
-        self.compression_method_zip = None    # Método de compressão para arquivos ZIP
+            # Definir variáveis para armazenar o método de compressão selecionado para cada tipo de arquivo.
+        self.compression_method_rar = None # Método de compressão para arquivos RAR
+        self.compression_method_zip = None
         self.compression_method_7z = None
         self.compression_method_tar = None
 
         # Atribuir o caminho do executável do 7zip à variável sevenzip_executable.
         self.sevenzip_executable = buscar_sevenzip_executavel()
 
-        # Verificar se o executável 7zip foi encontrado.
+        # Verificar se o executável do WinRAR ou do 7zip foi encontrado.
         if not self.sevenzip_executable:
-            print("7-Zip não encontrado. Por favor, instale e tente novamente.")
+            print("WinRAR não encontrado. Por favor, instale e tente novamente.")
             # Se nenhum dos executáveis for encontrado, o programa é encerrado.
             exit(1)
 
             # Crie listas separadas para cada tipo de compressão
-        self.output_listbox_zip = QListWidget()    # Lista de saída para arquivos ZIP
+        self.output_listbox_zip = QListWidget() # Lista de saída para arquivos ZIP
         self.output_listbox_7z = QListWidget()
         self.output_listbox_tar = QListWidget()
-        self.output_listbox = QListWidget()  # Lista de saída para arquivos a serem comprimidos
-        self.folder_listbox = QListWidget()  # Lista de entrada para arquivos a serem comprimidos
-        self.output_listbox_extract = QListWidget()  # Lista de saída para extração de arquivos
-        self.compressed_files = []  # Lista de arquivos comprimidos
+        self.output_listbox = QListWidget() # Lista de saída para arquivos a serem comprimidos
+        self.folder_listbox = QListWidget() # Lista de entrada para arquivos a serem comprimidos
+        self.output_listbox_extract = QListWidget() # Lista de saída para extração de arquivos
+        self.compressed_files = [] # Lista de arquivos comprimidos
 
         # Esta linha está criando uma nova instância da classe CompressaoZIP, passando três argumentos para o construtor:
-        # self.sevenzip_executable (o caminho para o executável do 7-Zip);
+        # self.sevenzip_executable (o caminho para o executável do 7zip);
         # self.output_listbox (um objeto ListBox que contém os caminhos de saída) e;
         # self.folder_listbox (um objeto ListBox que contém os caminhos dos arquivos a serem comprimidos).
         # A nova instância é armazenada na variável self.compress_thread_zip.
@@ -352,9 +349,7 @@ class GerenciadorInterface(QThread):
 
     # Define um método chamado browse_folder.
     # Este método não recebe argumentos além de self (uma referência ao objeto que o método foi chamado).
-    def browse_folder(self):
-        # Obtém o objeto pai do objeto atual (geralmente a janela principal da aplicação) e armazena em main_window.
-        main_window = self.parent()
+    def browse_folder(self, main_window):
         # Cria um novo diálogo de seleção de arquivos com o título "Selecionar Pastas". O diálogo é filho da janela principal.
         folder_dialog = QFileDialog(main_window, "Selecionar Pastas")
         # Define o modo do diálogo para permitir apenas a seleção de diretórios.
@@ -388,8 +383,7 @@ class GerenciadorInterface(QThread):
             # Adiciona os diretórios selecionados ao ListBox de pastas.
             self.folder_listbox.addItems(selected_folders)
 
-    def browse_file(self):
-        main_window = self.parent()
+    def browse_file(self, main_window):
         file_dialog = QFileDialog(main_window, "Selecionar Arquivos")
         # Define o modo do diálogo para permitir a seleção de arquivos.
         file_dialog.setFileMode(QFileDialog.FileMode.ExistingFiles)
@@ -417,8 +411,7 @@ class GerenciadorInterface(QThread):
         # Limpa o conteúdo do ListBox de pastas.
         self.folder_listbox.clear()
 
-    def browse_output(self):
-        main_window = self.parent()
+    def browse_output(self, main_window):
         output_dialog = QFileDialog(main_window, "Selecionar Pasta de Saída")
         output_dialog.setFileMode(QFileDialog.FileMode.Directory)
         output_dialog.setOption(QFileDialog.Option.ShowDirsOnly, True)
@@ -455,8 +448,7 @@ class GerenciadorInterface(QThread):
         self.output_listbox_extract.clear()
 
     # Define um método chamado select_output_path.
-    def select_output_path(self, output_listbox):
-        main_window = self.parent()
+    def select_output_path(self, output_listbox, main_window):
         output_dialog = QFileDialog(main_window, "Selecionar Pasta de Saída")
         output_dialog.setFileMode(QFileDialog.FileMode.Directory)
         output_dialog.setOption(QFileDialog.Option.ShowDirsOnly, True)
@@ -477,19 +469,19 @@ class GerenciadorInterface(QThread):
             # Adiciona os diretórios selecionados ao ListBox de saída correspondente.
             output_listbox.addItems(selected_output)
 
-    # Define um método chamado output_button_output_RAR_clicked.
+    # Define um método chamado output_button_output_ZIP_clicked.
     def output_button_output_ZIP_clicked(self):
         # Chama o método select_output_path, passando o ListBox de saída correspondente como argumento.
-        self.select_output_path(self.output_listbox_zip)
+        self.select_output_path(self.output_listbox_zip, self.main_window)
 
     def output_button_output_7Z_clicked(self):
-        self.select_output_path(self.output_listbox_7z)
+        self.select_output_path(self.output_listbox_7z, self.main_window)
 
     def output_button_output_TAR_clicked(self):
-        self.select_output_path(self.output_listbox_tar)
+        self.select_output_path(self.output_listbox_tar, self.main_window)
 
     def output_button_output_EXTRACT_clicked(self):
-        self.select_output_path(self.output_listbox_extract)
+        self.select_output_path(self.output_listbox_extract, self.main_window)
 
     # Define um método chamado store_as_zip.
     def store_as_zip(self):
@@ -497,7 +489,7 @@ class GerenciadorInterface(QThread):
         if self.compression_method_zip is not None:
             # Cria uma nova instância da classe CompressaoZIP, passando os argumentos necessários para o construtor.
             self.compress_thread_zip = CompressaoZIP(
-                # O caminho para o executável do 7-Zip.
+                # O caminho para o executável do 7zip.
                 # O ListBox de saída correspondente.
                 # O ListBox de pastas.
                 # O valor True para o parâmetro compress_as_zip.
@@ -511,7 +503,15 @@ class GerenciadorInterface(QThread):
             self.compress_thread_zip.start()
         # Se nenhum método de compressão foi selecionado, exibe uma mensagem de aviso.
         else:
-            QMessageBox.warning(self.parent(), "Aviso", "Por favor, selecione um método de compressão antes de prosseguir.")
+            # Obtém a janela pai do objeto atual.
+            parent = self.parent()
+            # Verifica se a janela pai é um objeto QWidget.
+            if isinstance(parent, QWidget):
+                # Se a janela pai for um objeto QWidget, exibe uma mensagem de aviso.
+                QMessageBox.warning(parent, "Aviso", "Por favor, selecione um método de compressão antes de prosseguir.")
+            else:
+                # Se a janela pai não for um objeto QWidget, exibe uma mensagem de aviso.
+                QMessageBox.warning(None, "Aviso", "Por favor, selecione um método de compressão antes de prosseguir.")
 
     def store_as_7z(self):
         if self.compression_method_7z is not None:
@@ -522,7 +522,15 @@ class GerenciadorInterface(QThread):
             self.compress_thread_7z.finished.connect(self.on_compress_finished)
             self.compress_thread_7z.start()
         else:
-            QMessageBox.warning(self.parent(), "Aviso", "Por favor, selecione um método de compressão antes de prosseguir.")
+            # Obtém a janela pai do objeto atual.
+            parent = self.parent()
+            # Verifica se a janela pai é um objeto QWidget.
+            if isinstance(parent, QWidget):
+                # Se a janela pai for um objeto QWidget, exibe uma mensagem de aviso.
+                QMessageBox.warning(parent, "Aviso", "Por favor, selecione um método de compressão antes de prosseguir.")
+            else:
+                # Se a janela pai não for um objeto QWidget, exibe uma mensagem de aviso.
+                QMessageBox.warning(None, "Aviso", "Por favor, selecione um método de compressão antes de prosseguir.")
 
     def store_as_tar(self):
         if self.compression_method_tar is not None:
@@ -533,12 +541,25 @@ class GerenciadorInterface(QThread):
             self.compress_thread_tar.finished.connect(self.on_compress_finished)
             self.compress_thread_tar.start()
         else:
-            QMessageBox.warning(self.parent(), "Aviso", "Por favor, selecione um método de compressão antes de prosseguir.")
+            # Obtém a janela pai do objeto atual.
+            parent = self.parent()
+            # Verifica se a janela pai é um objeto QWidget.
+            if isinstance(parent, QWidget):
+                # Se a janela pai for um objeto QWidget, exibe uma mensagem de aviso.
+                QMessageBox.warning(parent, "Aviso", "Por favor, selecione um método de compressão antes de prosseguir.")
+            else:
+                # Se a janela pai não for um objeto QWidget, exibe uma mensagem de aviso.
+                QMessageBox.warning(None, "Aviso", "Por favor, selecione um método de compressão antes de prosseguir.")
 
     # Define um método chamado testar_integridade.
     def testar_integridade(self):
         # Obtém a lista de arquivos selecionados pelo usuário.
-        selected_files = [self.folder_listbox.item(idx).text() for idx in range(self.folder_listbox.count())]
+        selected_files = []
+        for idx in range(self.folder_listbox.count()):
+            item = self.folder_listbox.item(idx)
+            if item is not None:
+                selected_files.append(item.text())
+        
         # Verifica se a lista de arquivos selecionados não está vazia.
         if self.sevenzip_executable and selected_files:
             # Cria uma nova instância da classe TesteIntegridade, passando os argumentos necessários para o construtor.
@@ -549,7 +570,11 @@ class GerenciadorInterface(QThread):
             self.teste_integridade_thread.start()
         # Se a lista de arquivos selecionados estiver vazia, exibe uma mensagem de aviso.
         else:
-            QMessageBox.warning(self.parent(), "Aviso", "Por favor, selecione um arquivo para testar a integridade.")
+            parent = self.parent()
+            if isinstance(parent, QWidget):
+                QMessageBox.warning(parent, "Aviso", "Por favor, selecione um arquivo para testar a integridade.")
+            else:
+                QMessageBox.warning(None, "Aviso", "Por favor, selecione um arquivo para testar a integridade.")
 
     # Define um método chamado extract_files.
     def extract_files(self):
@@ -557,7 +582,8 @@ class GerenciadorInterface(QThread):
         if self.sevenzip_executable:
             # Cria uma nova instância da classe Extracao, passando os argumentos necessários para o construtor.
             self.extract_thread = Extracao(
-                self.sevenzip_executable, self.output_listbox_extract, self.folder_listbox
+                self.sevenzip_executable, self.winrar_executable,
+                self.output_listbox_extract, self.folder_listbox
             )
             # Conecta o sinal finished da instância Extracao ao método self.on_extract_finished.
             self.extract_thread.finished.connect(self.on_extract_finished)
@@ -565,7 +591,11 @@ class GerenciadorInterface(QThread):
             self.extract_thread.start()
         # Se nenhum dos programas for encontrado, exibe uma mensagem de aviso.
         else:
-            QMessageBox.warning(self.parent(), "Aviso", "7-Zip não encontrado. Por favor, instale e tente novamente.")
+            parent = self.parent()
+            if isinstance(parent, QWidget):
+                QMessageBox.warning(parent, "Aviso", "Nenhum dos programas (WinRAR ou 7-Zip) encontrado. Por favor, instale um deles e tente novamente.")
+            else:
+                QMessageBox.warning(None, "Aviso", "Nenhum dos programas (WinRAR ou 7-Zip) encontrado. Por favor, instale um deles e tente novamente.")
 
     # Define um método chamado on_compress_finished.
     def on_compress_finished(self):
@@ -600,29 +630,34 @@ class InterfaceGrafica(QMainWindow):
     def __init__(self):
         super().__init__()
         # Cria o gerenciador de interface
-        self.gerenciador_interface = GerenciadorInterface()
+        self.gerenciador_interface = GerenciadorInterface(self)
 
         # Cria a barra de menus
         self.menu_bar = self.menuBar()
+        if self.menu_bar is None:
+            raise Exception("MenuBar não pôde ser criado")
 
         # Cria a barra de menus
-        self.settings_menu = self.menuBar().addMenu('Configurações')
-        # Adicionar ação para selecionar método de compressão
+        self.config_menu = self.menu_bar.addMenu('Configurações')
+        if self.config_menu is None:
+            raise Exception("Menu de Configurações não pôde ser criado")
+        
+            # Adicionar ação para selecionar método de compressão
         self.compression_method_action = QAction('Selecionar Método de Compressão', self)
-        # Conectar a ação a um método
+            # Conectar a ação a um método
         self.compression_method_action.triggered.connect(self.select_compression_method)
-        # Adicionar a ação ao menu
-        self.settings_menu.addAction(self.compression_method_action)
-        # Adiciona evento de entrada e saída para ativar o menu
-        self.settings_menu.aboutToShow.connect(self.select_compression_method)
+            # Adicionar a ação ao menu
+        self.config_menu.addAction(self.compression_method_action)
 
         # Cria o menu de temas
         self.themes_menu = QMenu('Temas', self)
-        # Adiciona o menu de temas ao menu de configurações
-        self.settings_menu.addMenu(self.themes_menu)
+            # Adiciona o menu de temas ao menu de configurações
+        self.config_menu.addMenu(self.themes_menu)
+            # Adiciona evento de entrada e saída para ativar o menu
+        self.config_menu.aboutToShow.connect(self.select_compression_method)
 
-        # Define um dicionário de ações de tema
-        self.theme_actions = {
+            # Define um dicionário de ações de tema
+        themes = {
             'Tema Neutro Padrão': self.apply_neutral_standart_theme,
             'Tema Claro': self.apply_light_theme,
             'Tema Escuro': self.apply_dark_theme,
@@ -635,15 +670,16 @@ class InterfaceGrafica(QMainWindow):
             'Tema Rosa': self.apply_pink_theme
         }
 
-        # Adiciona ação para cada tema
-        for theme_name, theme_method in self.theme_actions.items():
-            theme_action = QAction(theme_name, self)
-            theme_action.triggered.connect(theme_method)
-            theme_action.triggered.connect(lambda checked, name=theme_name: self.change_theme(name))
-            self.themes_menu.addAction(theme_action)
+            # Adiciona ação para cada tema
+        for theme_name, theme_action in themes.items():
+            action = QAction(theme_name, self)
+            action.triggered.connect(theme_action)
+            self.themes_menu.addAction(action)
 
         # Chama o método init_ui
         self.init_ui()
+
+        self.setStyle(QStyleFactory.create('Fusion'))
 
     # Define um método chamado select_compression_method
     def select_compression_method(self):
@@ -659,9 +695,9 @@ class InterfaceGrafica(QMainWindow):
 
         # Crie um menu para selecionar o método de compressão
         compression_menu = QMenu(self)
-        compression_menu.setStyleSheet(self.themes_menu.styleSheet())
+        compression_menu.setStyleSheet(self.themes_menu.styleSheet())	
 
-        # Adicione submenus para cada método de compressão do 7-Zip
+        # Adicione submenus para cada método de compressão do WinRAR
         zip_submenu = QMenu('ZIP (0-9)', self)
         zip_submenu.setStyleSheet(self.themes_menu.styleSheet())
         zip_methods = ["0", "1", "3", "5", "7", "9"]
@@ -675,7 +711,7 @@ class InterfaceGrafica(QMainWindow):
         tar_submenu = QMenu('TAR (0)', self)
         tar_submenu.setStyleSheet(self.themes_menu.styleSheet())
         tar_methods = ["0"]
-
+        
         # Adicione ação para cada método de compressão
         for method in zip_methods:
             # Crie uma ação para o método de compressão
@@ -706,7 +742,7 @@ class InterfaceGrafica(QMainWindow):
     def set_compression_method(self, checked, method, compress_type):
         # Verifica o tipo de compressão
         if compress_type == 'zip':
-            # Define o método de compressão para arquivos RAR
+            # Define o método de compressão para arquivos ZIP
             self.gerenciador_interface.compression_method_zip = method
         elif compress_type == '7z':
             self.gerenciador_interface.compression_method_7z = method
@@ -725,25 +761,16 @@ class InterfaceGrafica(QMainWindow):
         # dependendo de como o programa está sendo executado.
         icon_path = os.path.join(base_path, "icones")
 
-        # Define o título da janela
-        self.setWindowTitle("Gerenciador de BackUp")
-        # Esta linha está definindo o caminho completo para o arquivo de ícone "Manager-BackUp.ico", que está localizado na pasta "icones".
-        icon_title_path = os.path.join(icon_path, "Manager-BackUp.ico")
-        # Esta linha está definindo o ícone da janela para o ícone especificado pelo caminho icon_title_path.
-        # O método setWindowIcon é um método de um objeto de janela PyQt, e QtGui.QIcon é uma classe que encapsula um ícone.
-        self.setWindowIcon(QtGui.QIcon(icon_title_path))
-
-        ### Primeiro layout horizontal ###
         main_layout_1 = QHBoxLayout()
 
-        # Primeiro quadrante (topo esquerdo)
         primeiro_quadrante_layout = QVBoxLayout()
 
         folder_button = QPushButton("Adicionar Pastas")
-        folder_button.clicked.connect(self.gerenciador_interface.browse_folder)
+        folder_button.clicked.connect(lambda: self.gerenciador_interface.browse_folder(self))
         primeiro_quadrante_layout.addWidget(folder_button)
+
         file_button = QPushButton("Adicionar Arquivos")
-        file_button.clicked.connect(self.gerenciador_interface.browse_file)
+        file_button.clicked.connect(lambda: self.gerenciador_interface.browse_file(self))
         primeiro_quadrante_layout.addWidget(file_button)
 
         test_button = QPushButton("Testar Integridade")
@@ -757,6 +784,7 @@ class InterfaceGrafica(QMainWindow):
         clear_button_folders.setIcon(QtGui.QIcon(limpar_folders_icon_path))
         clear_button_folders.clicked.connect(self.gerenciador_interface.clear_folders)
         primeiro_quadrante_layout.addWidget(clear_button_folders)
+
         clear_button_output = QPushButton("Limpar Saídas")
         limpar_output_icon_path = os.path.join(icon_path, "clear_button2.png")
         clear_button_output.setIcon(QtGui.QIcon(limpar_output_icon_path))
@@ -766,7 +794,6 @@ class InterfaceGrafica(QMainWindow):
         main_layout_1.addLayout(primeiro_quadrante_layout)
         main_layout_1.setAlignment(primeiro_quadrante_layout, Qt.AlignmentFlag.AlignBottom)
 
-        # Segundo + Terceiro quadrante (topo centro e direito)
         segundo_quadrante_layout = QVBoxLayout()
 
         folder_label = QLabel("Diretório(s) Pastas e Arquivos:")
@@ -775,10 +802,8 @@ class InterfaceGrafica(QMainWindow):
         segundo_quadrante_layout.addWidget(self.gerenciador_interface.folder_listbox)
         main_layout_1.addLayout(segundo_quadrante_layout)
 
-        ### Segundo layout horizontal ###
         main_layout_2 = QHBoxLayout()
 
-        # Quarto quadrante (centro esquerdo)
         quarto_quadrante_layout = QVBoxLayout()
 
         output_button_output_ZIP = QPushButton("Especificar Diretório(s) de Saída .ZIP")
@@ -804,7 +829,6 @@ class InterfaceGrafica(QMainWindow):
         main_layout_2.addLayout(quarto_quadrante_layout)
         main_layout_2.setAlignment(quarto_quadrante_layout, Qt.AlignmentFlag.AlignBottom)
 
-        # Quinto quadrante (centro centro)
         quinto_quadrante_layout = QVBoxLayout()
 
         output_label_zip = QLabel("Diretório(s) de saída .ZIP:")
@@ -813,7 +837,6 @@ class InterfaceGrafica(QMainWindow):
         quinto_quadrante_layout.addWidget(self.gerenciador_interface.output_listbox_zip)
         main_layout_2.addLayout(quinto_quadrante_layout)
 
-        # Sexto quadrante (centro direito)
         sexto_quadrante_layout = QVBoxLayout()
 
         output_label_7z = QLabel("Diretório(s) de saída .7Z:")
@@ -822,10 +845,8 @@ class InterfaceGrafica(QMainWindow):
         sexto_quadrante_layout.addWidget(self.gerenciador_interface.output_listbox_7z)
         main_layout_2.addLayout(sexto_quadrante_layout)
 
-        ### Terceiro layout horizontal ###
         main_layout_3 = QHBoxLayout()
 
-        # Sétimo quadrante (inferior esquerdo)
         setimo_quadrante_layout = QVBoxLayout()
 
         output_button_output_TAR = QPushButton("Especificar Diretório(s) de Saída .TAR")
@@ -851,7 +872,6 @@ class InterfaceGrafica(QMainWindow):
         main_layout_3.addLayout(setimo_quadrante_layout)
         main_layout_3.setAlignment(setimo_quadrante_layout, Qt.AlignmentFlag.AlignBottom)
 
-        # Oitavo quadrante (inferior centro)
         oitavo_quadrante_layout = QVBoxLayout()
 
         output_label_tar = QLabel("Diretório(s) de saída .TAR:")
@@ -860,7 +880,6 @@ class InterfaceGrafica(QMainWindow):
         oitavo_quadrante_layout.addWidget(self.gerenciador_interface.output_listbox_tar)
         main_layout_3.addLayout(oitavo_quadrante_layout)
 
-        # Nono quadrante (inferior direito)
         nono_quadrante_layout = QVBoxLayout()
 
         output_label_extract = QLabel("Diretório(s) para Extração:")
@@ -869,17 +888,13 @@ class InterfaceGrafica(QMainWindow):
         nono_quadrante_layout.addWidget(self.gerenciador_interface.output_listbox_extract)
         main_layout_3.addLayout(nono_quadrante_layout)
 
-        # Criar dois widgets para acomodar os layouts horizontais
         widget_1 = QWidget(self)
         widget_1.setLayout(main_layout_1)
-
         widget_2 = QWidget(self)
         widget_2.setLayout(main_layout_2)
-
         widget_3 = QWidget(self)
         widget_3.setLayout(main_layout_3)
 
-        # Adicionar os widgets ao layout principal
         main_layout = QVBoxLayout()
         main_layout.addWidget(widget_1)
         main_layout.addWidget(widget_2)
@@ -889,236 +904,229 @@ class InterfaceGrafica(QMainWindow):
         central_widget.setLayout(main_layout)
         self.setCentralWidget(central_widget)
 
-        # O método self.apply_pink_theme() é uma chamada de função em Python.
-        # self é uma referência à instância atual da classe e apply_pink_theme é presumivelmente um método definido dentro dessa classe.
-        # Este método, como o nome sugere, provavelmente aplica um tema rosa à interface do usuário atual.
-        # No entanto, sem ver a implementação do método apply_pink_theme, não posso fornecer detalhes específicos sobre o que exatamente ele faz.
         self.apply_pink_theme()
-
         self.apply_yellow_theme()
-
         self.apply_orange_theme()
-
         self.apply_purple_theme()
-
         self.apply_green_theme()
-
         self.apply_red_theme()
-
         self.apply_blue_theme()
-
         self.apply_dark_theme()
-
         self.apply_light_theme()
-
         self.apply_neutral_standart_theme()
-
-        self.apply_neutral_standart_theme()
-
-        # O método self.change_theme(theme='Tema Neutro Padrão') é uma chamada de função em Python.
-        # self é uma referência à instância atual da classe e change_theme é presumivelmente um método definido dentro dessa classe.
-        # O método change_theme recebe um argumento nomeado theme, que neste caso é definido como 'Tema Neutro Padrão'.
-        # Isso sugere que o método change_theme é usado para alterar o tema da interface do usuário para o tema especificado.
-        self.change_theme(theme='Tema Neutro Padrão')
 
     # O método change_theme(self, theme) é usado para alterar o tema da interface do usuário de um aplicativo PyQt.
     # Aqui está uma descrição detalhada:
-    # Este é o início da definição do método.
-    # Ele recebe um argumento, theme, que é o nome do tema que você deseja aplicar.
+        # Este é o início da definição do método.
+        # Ele recebe um argumento, theme, que é o nome do tema que você deseja aplicar.
     def change_theme(self, theme):
+        # Este método é usado para definir o estilo do theme_menu (presumivelmente um objeto QMenu no PyQt).
+        # O estilo é definido usando uma folha de estilo em cascata (CSS), ...
+        # que é uma linguagem usada para descrever a aparência de um documento escrito em HTML ou XML.
+        # No caso de PyQt, ele é usado para estilizar widgets.
+            # QMenuBar::item:selected { background-color: #90c8f6; } ...
+            # QMenu::item:selected { background-color: #90c8f6; } ...
+                # altera a cor de fundo dos itens de menu selecionados para #90c8f6 (um tom de azul claro).
+            # QMenuBar::item:hover { background-color: #000000; } ...
+            # QMenu::item:hover { background-color: #000000; } ...
+                # altera a cor de fundo dos itens de menu quando o mouse passa sobre eles para #000000 (um tom de preto).
+        submenu_stylesheet = """
+            QMenu::item:selected {
+                background-color: #90c8f6;
+            }
+            QMenu::item:hover {
+                background-color: #000000;
+            }
+            QWidget {
+                background-color: #f0f0f0;
+                color: #333333;
+            }
+        """
+        menubar_stylesheet = """
+            QMenuBar::item:selected {
+                background-color: #90c8f6;
+            }
+            QMenuBar::item:hover {
+                background-color: #000000;
+            }
+            QWidget {
+                background-color: #f0f0f0;
+                color: #333333;
+            }
+        """
         # Esta linha verifica se o tema passado como argumento é 'Tema Neutro Padrão'.
         # Se for, ele executa o bloco de código a seguir.
         if theme == 'Tema Neutro Padrão':
-            # Este método é usado para definir o estilo do theme_menu (presumivelmente um objeto QMenu no PyQt).
-            # O estilo é definido usando uma folha de estilo em cascata (CSS), ...
-            # que é uma linguagem usada para descrever a aparência de um documento escrito em HTML ou XML.
-            # No caso de PyQt, ele é usado para estilizar widgets.
-            # QMenuBar::item:selected { background-color: #90c8f6; } ...
-            # QMenu::item:selected { background-color: #90c8f6; } ...
-            # altera a cor de fundo dos itens de menu selecionados para #90c8f6 (um tom de azul claro).
-            # QMenuBar::item:hover { background-color: #000000; } ...
-            # QMenu::item:hover { background-color: #000000; } ...
-            # altera a cor de fundo dos itens de menu quando o mouse passa sobre eles para #000000 (um tom de preto).
-            self.menu_bar.setStyleSheet("""
-                QMenuBar::item:selected {3 
-                    background-color: #90c8f6; 
-                }
-                QMenuBar::item:hover { 
-                    background-color: #000000; 
-                }
-            """)
-            self.themes_menu.setStyleSheet("""
-                QMenu::item:selected {
-                    background-color: #90c8f6;
-                }
-                QMenu::item:hover {
-                    background-color: #000000;
-                }
-            """)
+            pass
 
         elif theme == 'Tema Claro':
-            self.menu_bar.setStyleSheet("""
-                QMenuBar::item:selected { 
-                    background-color: #b3b3b3; 
-                }
-                QMenuBar::item:hover { 
-                    background-color: #333333; 
-                }
-            """)
-            self.themes_menu.setStyleSheet("""
+            submenu_stylesheet = """
                 QMenu::item:selected {
                     background-color: #b3b3b3;
                 }
                 QMenu::item:hover {
                     background-color: #333333;
                 }
-            """)
+            """
+            menubar_stylesheet = """
+                QMenuBar::item:selected { 
+                    background-color: #b3b3b3; 
+                }
+                QMenuBar::item:hover { 
+                    background-color: #333333; 
+                }
+            """
 
         elif theme == 'Tema Escuro':
-            self.menu_bar.setStyleSheet("""
-                QMenuBar::item:selected { 
-                    background-color: #333333; 
-                }
-                QMenuBar::item:hover { 
-                    background-color: #b3b3b3; 
-                }
-            """)
-            self.themes_menu.setStyleSheet("""
+            submenu_stylesheet = """
                 QMenu::item:selected {
                     background-color: #333333;
                 }
                 QMenu::item:hover {
                     background-color: #b3b3b3;
                 }
-            """)
+            """
+            menubar_stylesheet = """
+                QMenuBar::item:selected {
+                    background-color: #333333;
+                }
+                QMenuBar::item:hover {
+                    background-color: #b3b3b3;
+                }
+            """
 
         elif theme == 'Tema Azul':
-            self.menu_bar.setStyleSheet("""
-                QMenuBar::item:selected { 
-                    background-color: #b3d1ff; 
-                }
-                QMenuBar::item:hover { 
-                    background-color: #1a3348; 
-                }
-            """)
-            self.themes_menu.setStyleSheet("""
+            submenu_stylesheet = """
                 QMenu::item:selected {
-                    background-color: #b3d1ff;
+                    background-color: #538cc6;
                 }
                 QMenu::item:hover {
                     background-color: #1a3348;
                 }
-            """)
+            """
+            menubar_stylesheet = """
+                QMenuBar::item:selected {
+                    background-color: #538cc6;
+                }
+                QMenuBar::item:hover {
+                    background-color: #1a3348;
+                }
+            """
 
         elif theme == 'Tema Vermelho':
-            self.menu_bar.setStyleSheet("""
-                QMenuBar::item:selected { 
-                    background-color: #ff9999; 
-                }
-                QMenuBar::item:hover { 
-                    background-color: #4d1a1a; 
-                }
-            """)
-            self.themes_menu.setStyleSheet("""
+            submenu_stylesheet = """
                 QMenu::item:selected {
-                    background-color: #ff9999;
+                    background-color: #c65353;
                 }
                 QMenu::item:hover {
                     background-color: #4d1a1a;
                 }
-            """)
+            """
+            menubar_stylesheet = """
+                QMenuBar::item:selected {
+                    background-color: #c65353;
+                }
+                QMenuBar::item:hover {
+                    background-color: #4d1a1a;
+                }
+            """
 
         elif theme == 'Tema Verde':
-            self.menu_bar.setStyleSheet("""
-                QMenuBar::item:selected { 
-                    background-color: #99ffcc; 
-                }
-                QMenuBar::item:hover { 
-                    background-color: #1a4d33; 
-                }
-            """)
-            self.themes_menu.setStyleSheet("""
+            submenu_stylesheet = """
                 QMenu::item:selected {
-                    background-color: #99ffcc;
+                    background-color: #53c68c;
                 }
                 QMenu::item:hover {
                     background-color: #1a4d33;
                 }
-            """)
+            """
+            menubar_stylesheet = """
+                QMenuBar::item:selected {
+                    background-color: #53c68c;
+                }
+                QMenuBar::item:hover {
+                    background-color: #1a4d33;
+                }
+            """
 
         elif theme == 'Tema Roxo':
-            self.menu_bar.setStyleSheet("""
-                QMenuBar::item:selected { 
-                    background-color: #b399ff; 
-                }
-                QMenuBar::item:hover { 
-                    background-color: #331a4d; 
-                }
-            """)
-            self.themes_menu.setStyleSheet("""
+            submenu_stylesheet = """
                 QMenu::item:selected {
-                    background-color: #b399ff;
+                    background-color: #8c53c6;
                 }
                 QMenu::item:hover {
                     background-color: #331a4d;
                 }
-            """)
+            """
+            menubar_stylesheet = """
+                QMenuBar::item:selected {
+                    background-color: #8c53c6;
+                }
+                QMenuBar::item:hover {
+                    background-color: #331a4d;
+                }
+            """
 
         elif theme == 'Tema Laranja':
-            self.menu_bar.setStyleSheet("""
-                QMenuBar::item:selected { 
-                    background-color: #ffcc99; 
-                }
-                QMenuBar::item:hover { 
-                    background-color: #993d00; 
-                }
-            """)
-            self.themes_menu.setStyleSheet("""
+            submenu_stylesheet = """
                 QMenu::item:selected {
-                    background-color: #ffcc99;
+                    background-color: #ff751a;
                 }
                 QMenu::item:hover {
                     background-color: #993d00;
                 }
-            """)
+            """
+            menubar_stylesheet = """
+                QMenuBar::item:selected {
+                    background-color: #ff751a;
+                }
+                QMenuBar::item:hover {
+                    background-color: #993d00;
+                }
+            """
 
         elif theme == 'Tema Amarelo':
-            self.menu_bar.setStyleSheet("""
-                QMenuBar::item:selected { 
-                    background-color: #ffffcc; 
-                }
-                QMenuBar::item:hover { 
-                    background-color: #99993d; 
-                }
-            """)
-            self.themes_menu.setStyleSheet("""
+            submenu_stylesheet = """
                 QMenu::item:selected {
-                    background-color: #ffffcc;
+                    background-color: #ffffb3;
                 }
                 QMenu::item:hover {
                     background-color: #99993d;
                 }
-            """)
+            """
+            menubar_stylesheet = """
+                QMenuBar::item:selected {
+                    background-color: #ffffb3;
+                }
+                QMenuBar::item:hover {
+                    background-color: #99993d;
+                }
+            """
 
         elif theme == 'Tema Rosa':
-            self.menu_bar.setStyleSheet("""
-                QMenuBar::item:selected { 
-                    background-color: #ffccf2; 
+            submenu_stylesheet = """
+                QMenu::item:selected {
+                    background-color: #ffb3e6;
                 }
-                QMenuBar::item:hover { 
-                    background-color: #993d7a; 
+                QMenu::item:hover {
+                    background-color: #993d7a;
                 }
-            """)
-            self.themes_menu.setStyleSheet("""
-                QMenu::item:selected { 
-                    background-color: #ffccf2; 
+            """
+            menubar_stylesheet = """
+                QMenuBar::item:selected {
+                    background-color: #ffb3e6;
                 }
-                QMenu::item:hover { 
-                    background-color: #993d7a; 
+                QMenuBar::item:hover {
+                    background-color: #993d7a;
                 }
-            """)
+            """
 
-        self.settings_menu.setStyleSheet(self.themes_menu.styleSheet())
+        if self.themes_menu is not None:  # Verificando se theme_menu não é None
+            self.themes_menu.setStyleSheet(submenu_stylesheet)
+        if self.config_menu is not None:  # Verificando se config_menu não é None
+            self.config_menu.setStyleSheet(submenu_stylesheet)
+        if self.menu_bar is not None:  # Verificando se menu_bar não é None
+            self.menu_bar.setStyleSheet(menubar_stylesheet)
 
     def apply_neutral_standart_theme(self):
         self.setStyleSheet("""
@@ -1132,29 +1140,30 @@ class InterfaceGrafica(QMainWindow):
             min-height: 140px;
         }
         """)
+        self.change_theme('Tema Neutro Padrão')
 
     # O método apply_light_theme(self) é usado para aplicar um tema claro à interface do usuário de um aplicativo PyQt.
     # Ele faz isso definindo uma folha de estilo para o objeto atual (self), ...
     # que provavelmente é uma janela ou widget que contém outros widgets.
     # Aqui está uma descrição detalhada:
-    # QWidget { background-color: #f0f0f0; color: #333333; }:
-    # Isso define a cor de fundo de todos os widgets para #f0f0f0 ...
-    # (um tom de cinza claro) e a cor do texto para #333333 (um tom de cinza escuro).
-    # QPushButton { ... }:
-    # Isso define o estilo dos botões (QPushButton).
-    # Ele define a cor de fundo, o estilo e a cor da borda, o tamanho da fonte, ...
-    # a largura mínima e máxima, o preenchimento e a cor do texto.
-    # QPushButton:hover { ... }:
-    # Isso define o estilo dos botões quando o mouse passa sobre eles.
-    # Ele altera a cor de fundo, a cor da borda e a cor do texto.
-    # QLabel { color: #333333; }:
-    # Isso define a cor do texto de todos os rótulos (QLabel) para #333333 (um tom de cinza escuro).
-    # QListWidget { ... }:
-    # Isso define o estilo das listas de widgets (QListWidget).
-    # Ele define a cor de fundo, a largura mínima, a altura mínima e a cor do texto.
-    ## O método setStyleSheet é usado para aplicar a folha de estilo.
-    # As folhas de estilo em PyQt são uma maneira de estilizar widgets; ...
-    # elas usam uma sintaxe semelhante à das folhas de estilo em cascata (CSS) usadas em HTML.
+        # QWidget { background-color: #f0f0f0; color: #333333; }:
+            # Isso define a cor de fundo de todos os widgets para #f0f0f0 ...
+            # (um tom de cinza claro) e a cor do texto para #333333 (um tom de cinza escuro).
+        # QPushButton { ... }:
+            # Isso define o estilo dos botões (QPushButton).
+            # Ele define a cor de fundo, o estilo e a cor da borda, o tamanho da fonte, ...
+            # a largura mínima e máxima, o preenchimento e a cor do texto.
+        # QPushButton:hover { ... }:
+            # Isso define o estilo dos botões quando o mouse passa sobre eles.
+            # Ele altera a cor de fundo, a cor da borda e a cor do texto.
+        # QLabel { color: #333333; }:
+            # Isso define a cor do texto de todos os rótulos (QLabel) para #333333 (um tom de cinza escuro).
+        # QListWidget { ... }:
+            # Isso define o estilo das listas de widgets (QListWidget).
+            # Ele define a cor de fundo, a largura mínima, a altura mínima e a cor do texto.
+        ## O método setStyleSheet é usado para aplicar a folha de estilo.
+            # As folhas de estilo em PyQt são uma maneira de estilizar widgets; ...
+            # elas usam uma sintaxe semelhante à das folhas de estilo em cascata (CSS) usadas em HTML.
     def apply_light_theme(self):
         self.setStyleSheet("""
         QWidget {
@@ -1188,6 +1197,7 @@ class InterfaceGrafica(QMainWindow):
             color: #333333;
         }
         """)
+        self.change_theme('Tema Claro')
 
     def apply_dark_theme(self):
         self.setStyleSheet("""
@@ -1222,6 +1232,7 @@ class InterfaceGrafica(QMainWindow):
             color: #f0f0f0;
         }
         """)
+        self.change_theme('Tema Escuro')
 
     def apply_blue_theme(self):
         self.setStyleSheet("""
@@ -1256,6 +1267,7 @@ class InterfaceGrafica(QMainWindow):
             color: #ffffff;
         }
         """)
+        self.change_theme('Tema Azul')
 
     def apply_red_theme(self):
         self.setStyleSheet("""
@@ -1290,6 +1302,7 @@ class InterfaceGrafica(QMainWindow):
             color: #ffffff;
         }
         """)
+        self.change_theme('Tema Vermelho')
 
     def apply_green_theme(self):
         self.setStyleSheet("""
@@ -1324,6 +1337,7 @@ class InterfaceGrafica(QMainWindow):
             color: #ffffff;
         }
         """)
+        self.change_theme('Tema Verde')
 
     def apply_purple_theme(self):
         self.setStyleSheet("""
@@ -1358,6 +1372,7 @@ class InterfaceGrafica(QMainWindow):
             color: #ffffff;
         }
         """)
+        self.change_theme('Tema Roxo')
 
     def apply_orange_theme(self):
         self.setStyleSheet("""
@@ -1392,6 +1407,7 @@ class InterfaceGrafica(QMainWindow):
             color: #ffffff;
         }
         """)
+        self.change_theme('Tema Laranja')
 
     def apply_yellow_theme(self):
         self.setStyleSheet("""
@@ -1426,6 +1442,7 @@ class InterfaceGrafica(QMainWindow):
             color: #333333;
         }
         """)
+        self.change_theme('Tema Amarelo')
 
     def apply_pink_theme(self):
         self.setStyleSheet("""
@@ -1460,6 +1477,7 @@ class InterfaceGrafica(QMainWindow):
             color: #ffffff;
         }
         """)
+        self.change_theme('Tema Rosa')
 
 
 # Esta linha verifica se o script atual está sendo executado diretamente, e não sendo importado como um módulo.
