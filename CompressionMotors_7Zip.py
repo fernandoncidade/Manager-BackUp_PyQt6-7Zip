@@ -87,10 +87,10 @@ class CompressaoZIP(QThread):
                 # Nesta linha, o caminho completo do arquivo comprimido é construído usando a função join do módulo os.
                 # O caminho de saída e o nome da pasta são combinados com a extensão .rar para formar o caminho completo do arquivo comprimido.
                 # O caminho é armazenado na variável compressed_file_zip.
-                compressed_file_zip = os.path.join(output_path, f"{folder_name}.rar")
+                compressed_file_zip = os.path.join(output_path, f"{folder_name}.zip")
                 # Aqui, uma string command é construída para representar o comando que será executado para comprimir a pasta.
                 # O comando inclui o executável do WinRAR, opções de compressão e os caminhos do arquivo comprimido e da pasta.
-                command = f'"{self.winrar_executable}" a -r -ep1 -m{self.compression_method} -md1024 -afrar -o+ "{compressed_file_zip}" "{folder_path}"'
+                command = f'"{self.sevenzip_executable}" a -r -tzip -mx={self.compression_method} "{compressed_file_zip}" "{folder_path}"'
                 # Nesta linha, o comando construído anteriormente é executado usando o módulo subprocess.
                 # O parâmetro shell=True indica que o comando deve ser executado em um shell.
                 subprocess.run(command, shell=True)

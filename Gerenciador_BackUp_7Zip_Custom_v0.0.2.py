@@ -1,5 +1,6 @@
 import os  # Importa o módulo os
 import sys  # Importa o módulo sys
+import json  # Importa o módulo json
 # Importa as classes QApplication, QMainWindow, QVBoxLayout, QHBoxLayout, QLabel, QListWidget,
 # QPushButton, QWidget, QMenu, QStyleFactory do módulo QtWidgets
 from PyQt6.QtWidgets import (QApplication, QMainWindow, QVBoxLayout, QHBoxLayout, QLabel,
@@ -12,6 +13,8 @@ from PyQt6.QtGui import QAction
 from PyQt6 import QtGui
 # Importa a classe GerenciadorInterface do módulo ManagerInterface_7Zip
 from ManagerInterface_7Zip import GerenciadorInterface
+# Importa a classe MetodoCompressao do módulo CompressionMethod
+from CompressionMethod_7Zip import MetodoCompressao
 # Importa as funções change_theme, apply_neutral_standart_theme, apply_light_theme, apply_dark_theme, apply_blue_theme,
 # apply_red_theme, apply_green_theme, apply_purple_theme, apply_orange_theme, apply_yellow_theme, apply_pink_theme
 # do módulo Colors
@@ -21,7 +24,7 @@ from Colors import (change_theme, apply_neutral_standart_theme, apply_light_them
 
 
 # Define uma nova classe chamada InterfaceGrafica que herda de QMainWindow, uma classe do PyQt que representa uma janela.
-class InterfaceGrafica(QMainWindow):
+class InterfaceGrafica(QMainWindow, MetodoCompressao):
     def __init__(self):
         super().__init__()
         # Cria o gerenciador de interface
@@ -73,76 +76,30 @@ class InterfaceGrafica(QMainWindow):
 
         # Chama o método init_ui
         self.init_ui()
-
+        # Define o estilo da interface gráfica
         self.setStyle(QStyleFactory.create('Fusion'))
+        # Chama e carrega o método de compressão
+        self.load_compression_method()
 
-    # Define um método chamado select_compression_method
-    def select_compression_method(self):
-        # Dicionário de legendas para os métodos de compressão
-        legends_sevenzip = {
-            "0": "0 - Armazenar",
-            "1": "1 - Mais Rápido",
-            "3": "3 - Rápido",
-            "5": "5 - Normal",
-            "7": "7 - Máximo",
-            "9": "9 - Ultra"
-        }
+    # Define um método chamado load_compression_method
+    def load_compression_method(self):
+        # Define o caminho do método de configuração
+        config_method = getattr(sys, '_MEIPASS', os.path.dirname(os.path.realpath(__file__)))
+        config_path = os.path.join(config_method, "Config_Method")
+        caminho_metodo = os.path.join(config_path, 'config.json')
 
-        # Crie um menu para selecionar o método de compressão
-        compression_menu = QMenu(self)
-        compression_menu.setStyleSheet(self.themes_menu.styleSheet())	
+        # Tenta abrir o arquivo de configuração
+        try:
+            # Carrega o método de compressão do arquivo de configuração
+            with open(caminho_metodo, 'r') as f:
+                config = json.load(f)
+                self.set_compression_method(False, config['compress_type_zip'], 'zip')
+                self.set_compression_method(False, config['compress_type_7z'], '7z')
+                self.set_compression_method(False, config['compress_type_tar'], 'tar')
 
-        # Adicione submenus para cada método de compressão do WinRAR
-        zip_submenu = QMenu('ZIP (0-9)', self)
-        zip_submenu.setStyleSheet(self.themes_menu.styleSheet())
-        zip_methods = ["0", "1", "3", "5", "7", "9"]
-
-        # Adicione submenus para cada método de compressão do 7-Zip
-        seven_submenu = QMenu('7Z (0-9)', self)
-        seven_submenu.setStyleSheet(self.themes_menu.styleSheet())
-        seven_methods = ["0", "1", "3", "5", "7", "9"]
-
-        # Adicione submenus para cada método de compressão do 7-Zip
-        tar_submenu = QMenu('TAR (0)', self)
-        tar_submenu.setStyleSheet(self.themes_menu.styleSheet())
-        tar_methods = ["0"]
-        
-        # Adicione ação para cada método de compressão
-        for method in zip_methods:
-            # Crie uma ação para o método de compressão
-            action = QAction(legends_sevenzip[method], self)
-            # Conecte a ação a um método, passando o método de compressão como argumento
-            action.triggered.connect(lambda checked=False, method=method: self.set_compression_method(checked, method, 'zip'))
-            # Adicione a ação ao submenu do 7-Zip
-            zip_submenu.addAction(action)
-        # Adicione o submenu do 7-Zip ao menu de compressão
-        compression_menu.addMenu(zip_submenu)
-
-        for method in seven_methods:
-            action = QAction(legends_sevenzip[method], self)
-            action.triggered.connect(lambda checked=False, method=method: self.set_compression_method(checked, method, '7z'))
-            seven_submenu.addAction(action)
-        compression_menu.addMenu(seven_submenu)
-
-        for method in tar_methods:
-            action = QAction(legends_sevenzip[method], self)
-            action.triggered.connect(lambda checked=False, method=method: self.set_compression_method(checked, method, 'tar'))
-            tar_submenu.addAction(action)
-        compression_menu.addMenu(tar_submenu)
-
-        # Adicione o menu de compressão como submenu do menu principal
-        self.compression_method_action.setMenu(compression_menu)
-
-    # Define um método chamado set_compression_method
-    def set_compression_method(self, checked, method, compress_type):
-        # Verifica o tipo de compressão
-        if compress_type == 'zip':
-            # Define o método de compressão para arquivos ZIP
-            self.gerenciador_interface.compression_method_zip = method
-        elif compress_type == '7z':
-            self.gerenciador_interface.compression_method_7z = method
-        elif compress_type == 'tar':
-            self.gerenciador_interface.compression_method_tar = method
+        # Verifica se o arquivo de configuração não existe
+        except FileNotFoundError:
+            pass
 
     # Define um método chamado init_ui
     def init_ui(self):
