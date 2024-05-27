@@ -2,8 +2,12 @@
 from PyQt6.QtWidgets import (QListWidget, QFileDialog, QWidget, QTreeView, QMessageBox)
 # Importa a classe QThread do módulo QtCore
 from PyQt6.QtCore import QThread
+# Importa a classe Queue do módulo queue
+from queue import Queue
 # Importa as classes CompressaoZIP, Compressao7Z, CompressaoTAR, TesteIntegridade, Extracao do módulo CompressionMotors_7Zip
 from CompressionMotors_7Zip import (buscar_sevenzip_executavel, CompressaoZIP, Compressao7Z, CompressaoTAR, TesteIntegridade, Extracao)
+# Importa as funções apply_dialog_box_theme, apply_message_box_theme do módulo Colors
+from Colors import apply_dialog_box_theme, apply_message_box_theme
 
 
 # Define uma nova classe chamada GerenciadorInterface que herda de QThread, uma classe do PyQt que permite a criação de threads.
@@ -11,21 +15,30 @@ class GerenciadorInterface(QThread):
     # Define o método inicializador da classe, que é chamado quando um objeto da classe é criado.
     def __init__(self, main_window):
         # Chama o método inicializador da classe pai (QThread), que é necessário para a correta inicialização da thread.
-        super().__init__()
+        super(GerenciadorInterface, self).__init__()
         self.main_window = main_window
+        # Cria uma fila para armazenar os arquivos a serem comprimidos.
+        self.compress_queue = Queue()
+
+            # Cria uma fila para armazenar os arquivos a serem extraídos.
+        self.compress_thread_zip = None # Thread de compressão para arquivos ZIP
+        self.compress_thread_7z = None
+        self.compress_thread_tar = None
 
             # Definir variáveis para armazenar o método de compressão selecionado para cada tipo de arquivo.
-        self.compression_method_rar = None # Método de compressão para arquivos RAR
-        self.compression_method_zip = None
+        self.compression_method_zip = None # Método de compressão para arquivos ZIP
         self.compression_method_7z = None
         self.compression_method_tar = None
+
+            # Atualizar arquivos existentes
+        self.update_existing = None
 
         # Atribuir o caminho do executável do 7zip à variável sevenzip_executable.
         self.sevenzip_executable = buscar_sevenzip_executavel()
 
         # Verificar se o executável do WinRAR ou do 7zip foi encontrado.
         if not self.sevenzip_executable:
-            print("WinRAR não encontrado. Por favor, instale e tente novamente.")
+            print("7-Zip não encontrado. Por favor, instale e tente novamente.")
             # Se nenhum dos executáveis for encontrado, o programa é encerrado.
             exit(1)
 
@@ -37,22 +50,23 @@ class GerenciadorInterface(QThread):
         self.folder_listbox = QListWidget() # Lista de entrada para arquivos a serem comprimidos
         self.output_listbox_extract = QListWidget() # Lista de saída para extração de arquivos
         self.compressed_files = [] # Lista de arquivos comprimidos
+        self.compress_threads = [] # Lista de threads de compressão
 
         # Esta linha está criando uma nova instância da classe CompressaoZIP, passando três argumentos para o construtor:
         # self.sevenzip_executable (o caminho para o executável do 7zip);
         # self.output_listbox (um objeto ListBox que contém os caminhos de saída) e;
         # self.folder_listbox (um objeto ListBox que contém os caminhos dos arquivos a serem comprimidos).
         # A nova instância é armazenada na variável self.compress_thread_zip.
-        self.compress_thread_zip = CompressaoZIP(self.sevenzip_executable, self.output_listbox, self.folder_listbox)
+        self.compress_thread_zip = CompressaoZIP(self.sevenzip_executable, self.update_existing, self.output_listbox, self.folder_listbox)
         # Esta linha está conectando o sinal finished da instância CompressaoZIP ao método self.on_compress_finished.
         # Isso significa que quando o sinal finished for emitido (ou seja, quando a compressão estiver concluída);
         # o método self.on_compress_finished será chamado automaticamente.
         self.compress_thread_zip.finished.connect(self.on_compress_finished)
 
-        self.compress_thread_7z = Compressao7Z(self.sevenzip_executable, self.output_listbox, self.folder_listbox)
+        self.compress_thread_7z = Compressao7Z(self.sevenzip_executable, self.update_existing, self.output_listbox, self.folder_listbox)
         self.compress_thread_7z.finished.connect(self.on_compress_finished)
 
-        self.compress_thread_tar = CompressaoTAR(self.sevenzip_executable, self.output_listbox, self.folder_listbox)
+        self.compress_thread_tar = CompressaoTAR(self.sevenzip_executable, self.update_existing, self.output_listbox, self.folder_listbox)
         self.compress_thread_tar.finished.connect(self.on_compress_finished)
 
         self.teste_integridade_thread = TesteIntegridade(self.sevenzip_executable, self.compressed_files)
@@ -82,6 +96,11 @@ class GerenciadorInterface(QThread):
         folder_dialog.setLabelText(QFileDialog.DialogLabel.Accept, "Selecionar")
         # Define o texto do botão de rejeição do diálogo para "Cancelar".
         folder_dialog.setLabelText(QFileDialog.DialogLabel.Reject, "Cancelar")
+        # Desabilita a alça de redimensionamento do diálogo.
+        folder_dialog.setSizeGripEnabled(False)
+
+        # Definindo a folha de estilo CSS para a caixa de diálogo de seleção de arquivos.
+        apply_dialog_box_theme(folder_dialog)
 
         # Procura por um objeto QTreeView filho do diálogo e armazena em tree_view.
         tree_view = folder_dialog.findChild(QTreeView)
@@ -109,6 +128,9 @@ class GerenciadorInterface(QThread):
         file_dialog.setOption(QFileDialog.Option.DontResolveSymlinks, True)
         file_dialog.setLabelText(QFileDialog.DialogLabel.Accept, "Selecionar")
         file_dialog.setLabelText(QFileDialog.DialogLabel.Reject, "Cancelar")
+        file_dialog.setSizeGripEnabled(False)
+
+        apply_dialog_box_theme(file_dialog)
 
         tree_view = file_dialog.findChild(QTreeView)
         if tree_view:
@@ -135,6 +157,9 @@ class GerenciadorInterface(QThread):
         output_dialog.setOption(QFileDialog.Option.DontResolveSymlinks, True)
         output_dialog.setLabelText(QFileDialog.DialogLabel.Accept, "Selecionar")
         output_dialog.setLabelText(QFileDialog.DialogLabel.Reject, "Cancelar")
+        output_dialog.setSizeGripEnabled(False)
+
+        apply_dialog_box_theme(output_dialog)
 
         tree_view = output_dialog.findChild(QTreeView)
         if tree_view:
@@ -172,6 +197,9 @@ class GerenciadorInterface(QThread):
         output_dialog.setOption(QFileDialog.Option.DontResolveSymlinks, True)
         output_dialog.setLabelText(QFileDialog.DialogLabel.Accept, "Selecionar")
         output_dialog.setLabelText(QFileDialog.DialogLabel.Reject, "Cancelar")
+        output_dialog.setSizeGripEnabled(False)
+
+        apply_dialog_box_theme(output_dialog)
 
         tree_view = output_dialog.findChild(QTreeView)
         if tree_view:
@@ -199,71 +227,63 @@ class GerenciadorInterface(QThread):
 
     # Define um método chamado store_as_zip.
     def store_as_zip(self):
+        if self.folder_listbox.count() == 0: # Verifica se o ListBox de pastas está vazio.
+            self.show_selection_compression_warning() # Exibe uma mensagem de aviso.
+
+        elif self.output_listbox_zip.count() == 0: # Verifica se o ListBox de saída para arquivos RAR está vazio.
+            self.show_selection_destination_warning() # Exibe uma mensagem de aviso.
+
         # Verifica se um método de compressão foi selecionado.
-        if self.compression_method_zip is not None:
+        elif self.compression_method_zip is not None:
             # Cria uma nova instância da classe CompressaoZIP, passando os argumentos necessários para o construtor.
-            self.compress_thread_zip = CompressaoZIP(
+            new_compress_thread = CompressaoZIP(
                 # O caminho para o executável do 7zip.
                 # O ListBox de saída correspondente.
                 # O ListBox de pastas.
                 # O valor True para o parâmetro compress_as_zip.
                 # O método de compressão selecionado.
-                self.sevenzip_executable, self.output_listbox_zip, self.folder_listbox,
+                self.sevenzip_executable, self.update_existing, self.output_listbox_zip, self.folder_listbox,
                 compress_as_zip=True, compression_method=self.compression_method_zip
             )
             # Conecta o sinal finished da instância CompressaoZIP ao método self.on_compress_finished.
-            self.compress_thread_zip.finished.connect(self.on_compress_finished)
-            # Inicia a thread.
-            self.compress_thread_zip.start()
-        # Se nenhum método de compressão foi selecionado, exibe uma mensagem de aviso.
+            new_compress_thread.finished.connect(self.on_compress_finished)
+            self.start_compression_thread(new_compress_thread)
         else:
-            # Obtém a janela pai do objeto atual.
-            parent = self.parent()
-            # Verifica se a janela pai é um objeto QWidget.
-            if isinstance(parent, QWidget):
-                # Se a janela pai for um objeto QWidget, exibe uma mensagem de aviso.
-                QMessageBox.warning(parent, "Aviso", "Por favor, selecione um método de compressão antes de prosseguir.")
-            else:
-                # Se a janela pai não for um objeto QWidget, exibe uma mensagem de aviso.
-                QMessageBox.warning(None, "Aviso", "Por favor, selecione um método de compressão antes de prosseguir.")
+            self.show_method_warning()
 
     def store_as_7z(self):
-        if self.compression_method_7z is not None:
-            self.compress_thread_7z = Compressao7Z(
-                self.sevenzip_executable, self.output_listbox_7z, self.folder_listbox,
+        if self.folder_listbox.count() == 0:
+            self.show_selection_compression_warning()
+
+        elif self.output_listbox_7z.count() == 0:
+            self.show_selection_destination_warning()
+
+        elif self.compression_method_7z is not None:
+            new_compress_thread = Compressao7Z(
+                self.sevenzip_executable, self.update_existing, self.output_listbox_7z, self.folder_listbox,
                 compress_as_7z=True, compression_method=self.compression_method_7z
             )
-            self.compress_thread_7z.finished.connect(self.on_compress_finished)
-            self.compress_thread_7z.start()
+            new_compress_thread.finished.connect(self.on_compress_finished)
+            self.start_compression_thread(new_compress_thread)
         else:
-            # Obtém a janela pai do objeto atual.
-            parent = self.parent()
-            # Verifica se a janela pai é um objeto QWidget.
-            if isinstance(parent, QWidget):
-                # Se a janela pai for um objeto QWidget, exibe uma mensagem de aviso.
-                QMessageBox.warning(parent, "Aviso", "Por favor, selecione um método de compressão antes de prosseguir.")
-            else:
-                # Se a janela pai não for um objeto QWidget, exibe uma mensagem de aviso.
-                QMessageBox.warning(None, "Aviso", "Por favor, selecione um método de compressão antes de prosseguir.")
+            self.show_method_warning()
 
     def store_as_tar(self):
-        if self.compression_method_tar is not None:
-            self.compress_thread_tar = CompressaoTAR(
-                self.sevenzip_executable, self.output_listbox_tar, self.folder_listbox,
+        if self.folder_listbox.count() == 0:
+            self.show_selection_compression_warning()
+
+        elif self.output_listbox_tar.count() == 0:
+            self.show_selection_destination_warning()
+
+        elif self.compression_method_tar is not None:
+            new_compress_thread = CompressaoTAR(
+                self.sevenzip_executable, self.update_existing, self.output_listbox_tar, self.folder_listbox,
                 compress_as_tar=True, compression_method=self.compression_method_tar
             )
-            self.compress_thread_tar.finished.connect(self.on_compress_finished)
-            self.compress_thread_tar.start()
+            new_compress_thread.finished.connect(self.on_compress_finished)
+            self.start_compression_thread(new_compress_thread)
         else:
-            # Obtém a janela pai do objeto atual.
-            parent = self.parent()
-            # Verifica se a janela pai é um objeto QWidget.
-            if isinstance(parent, QWidget):
-                # Se a janela pai for um objeto QWidget, exibe uma mensagem de aviso.
-                QMessageBox.warning(parent, "Aviso", "Por favor, selecione um método de compressão antes de prosseguir.")
-            else:
-                # Se a janela pai não for um objeto QWidget, exibe uma mensagem de aviso.
-                QMessageBox.warning(None, "Aviso", "Por favor, selecione um método de compressão antes de prosseguir.")
+            self.show_method_warning()
 
     # Define um método chamado testar_integridade.
     def testar_integridade(self):
@@ -273,31 +293,40 @@ class GerenciadorInterface(QThread):
             item = self.folder_listbox.item(idx)
             if item is not None:
                 selected_files.append(item.text())
+
+        # Filtra a lista de arquivos selecionados para incluir apenas arquivos comprimidos.
+        compressed_files = [file for file in selected_files if file.lower().endswith(('.zip', '.7z', '.tar'))]
+
+        # Verifica se a lista de arquivos comprimidos não está vazia.
+        if not compressed_files:
+            self.show_extension_warning()
+            return
         
         # Verifica se a lista de arquivos selecionados não está vazia.
-        if self.sevenzip_executable and selected_files:
+        if self.sevenzip_executable and compressed_files:
             # Cria uma nova instância da classe TesteIntegridade, passando os argumentos necessários para o construtor.
-            self.teste_integridade_thread = TesteIntegridade(self.sevenzip_executable, selected_files)
+            self.teste_integridade_thread = TesteIntegridade(self.sevenzip_executable, compressed_files)
             # Conecta o sinal finished da instância TesteIntegridade ao método self.on_teste_integridade_finished.
             self.teste_integridade_thread.finished.connect(self.on_teste_integridade_finished)
             # Inicia a thread.
             self.teste_integridade_thread.start()
         # Se a lista de arquivos selecionados estiver vazia, exibe uma mensagem de aviso.
         else:
-            parent = self.parent()
-            if isinstance(parent, QWidget):
-                QMessageBox.warning(parent, "Aviso", "Por favor, selecione um arquivo para testar a integridade.")
-            else:
-                QMessageBox.warning(None, "Aviso", "Por favor, selecione um arquivo para testar a integridade.")
+            self.show_integridade_warning()
 
     # Define um método chamado extract_files.
     def extract_files(self):
+        if self.folder_listbox.count() == 0: # Verifica se o ListBox de pastas está vazio.
+            self.show_selection_descompression_warning() # Exibe uma mensagem de aviso.
+
+        elif self.output_listbox_extract.count() == 0: # Verifica se o ListBox de saída para extração está vazio.
+            self.show_selection_destination_warning() # Exibe uma mensagem de aviso.
+
         # Verifica se o executável do 7zip foi encontrado.
-        if self.sevenzip_executable:
+        elif self.sevenzip_executable:
             # Cria uma nova instância da classe Extracao, passando os argumentos necessários para o construtor.
             self.extract_thread = Extracao(
-                self.sevenzip_executable, self.winrar_executable,
-                self.output_listbox_extract, self.folder_listbox
+                self.sevenzip_executable, self.output_listbox_extract, self.folder_listbox
             )
             # Conecta o sinal finished da instância Extracao ao método self.on_extract_finished.
             self.extract_thread.finished.connect(self.on_extract_finished)
@@ -305,35 +334,104 @@ class GerenciadorInterface(QThread):
             self.extract_thread.start()
         # Se nenhum dos programas for encontrado, exibe uma mensagem de aviso.
         else:
-            parent = self.parent()
-            if isinstance(parent, QWidget):
-                QMessageBox.warning(parent, "Aviso", "Nenhum dos programas (WinRAR ou 7-Zip) encontrado. Por favor, instale um deles e tente novamente.")
-            else:
-                QMessageBox.warning(None, "Aviso", "Nenhum dos programas (WinRAR ou 7-Zip) encontrado. Por favor, instale um deles e tente novamente.")
+            self.show_extract_warning()
+
+    def start_compression_thread(self, new_thread):
+        # Verifica se há alguma thread em execução com o mesmo formato de compressão.
+        new_format = new_thread.format
+
+        # Se houver uma thread em execução com o mesmo formato de compressão, coloque a nova thread na fila.
+        if any(thread.isRunning() and thread.format == new_format for thread in self.compress_threads):
+            self.compress_queue.put(new_thread) # Adiciona a nova thread à fila.
+            self.show_queue_warning() # Exibe uma mensagem de aviso.
+
+        # Se não houver threads em execução com o mesmo formato de compressão, inicie a nova thread.
+        else:
+            new_thread.start() # Inicia a nova thread.
+            self.compress_threads.append(new_thread) # Adiciona a nova thread à lista de threads de compressão.
 
     # Define um método chamado on_compress_finished.
     def on_compress_finished(self):
-        # Cria uma nova instância da classe QMessageBox.
-        msg_box = QMessageBox()
-        # Define o ícone da caixa de mensagem como um ícone de informação.
-        msg_box.setIcon(QMessageBox.Icon.Information)
-        # Define o título da caixa de mensagem como "Empacotamento Concluído".
-        msg_box.setWindowTitle("Empacotamento Concluído")
-        # Define o texto da caixa de mensagem como "O Empacotamento dos arquivos foi concluído com sucesso!".
-        msg_box.setText("O Empacotamento dos arquivos foi concluído com sucesso!")
-        # Exibe a caixa de mensagem.
-        msg_box.exec()
+        finished_thread = self.sender() # Obtém a thread que emitiu o sinal finished.
+        self.compress_threads.remove(finished_thread) # Remove a thread da lista de threads de compressão.
 
+        if not self.compress_queue.empty(): # Verifica se a fila de compressão não está vazia.
+            next_thread = self.compress_queue.get() # Obtém a próxima thread da fila.
+            self.start_compression_thread(next_thread) # Inicia a próxima thread.
+
+        elif not self.compress_threads:
+            # Cria uma nova instância da classe QMessageBox.
+            msg_box = QMessageBox()
+            # Define o ícone da caixa de mensagem como um ícone de informação.
+            msg_box.setIcon(QMessageBox.Icon.Information)
+            # Define o título da caixa de mensagem como "Empacotamento Concluído".
+            msg_box.setWindowTitle("Empacotamento Concluído")
+            # Define o texto da caixa de mensagem como "O Empacotamento dos arquivos foi concluído com sucesso!".
+            msg_box.setText("O Empacotamento dos arquivos foi concluído com sucesso!")
+            # Aplica o tema da caixa de mensagem.
+            apply_message_box_theme(msg_box)
+            # Exibe a caixa de mensagem.
+            msg_box.exec()
+
+    # Define um método chamado on_teste_integridade_finished.
     def on_teste_integridade_finished(self):
-        msg_box = QMessageBox()
-        msg_box.setIcon(QMessageBox.Icon.Information)
-        msg_box.setWindowTitle("Teste de Integridade Concluído")
-        msg_box.setText("O teste de integridade dos arquivos foi concluído com sucesso!")
-        msg_box.exec()
+        msg_box = QMessageBox() # Cria uma nova instância da classe QMessageBox.
+        msg_box.setIcon(QMessageBox.Icon.Information) # Define o ícone da caixa de mensagem como um ícone de informação.
+        msg_box.setWindowTitle("Teste de Integridade Concluído") # Define o título da caixa de mensagem como "Teste de Integridade Concluído".
+        msg_box.setText("O teste de integridade dos arquivos foi concluído com sucesso!") # Define o texto da caixa de mensagem como "O teste de integridade dos arquivos foi concluído com sucesso!".
+        apply_message_box_theme(msg_box) # Aplica o tema da caixa de mensagem.
+        msg_box.exec() # Exibe a caixa de mensagem.
 
     def on_extract_finished(self):
         msg_box = QMessageBox()
         msg_box.setIcon(QMessageBox.Icon.Information)
         msg_box.setWindowTitle("Extração Concluída")
         msg_box.setText("A Extração dos arquivos foi concluída com sucesso!")
+        apply_message_box_theme(msg_box)
         msg_box.exec()
+
+    # Define um método chamado show_queue_warning.
+    def show_queue_warning(self):
+        parent = self.parent() if isinstance(self.parent(), QWidget) else QWidget() # Obtém a janela pai do objeto.
+        self.show_warning(parent, "Aviso", "O processo solicitado foi colocado em fila, aguardando o anterior encerrar.") # Exibe uma mensagem de aviso.
+
+    def show_method_warning(self):
+        parent = self.parent() if isinstance(self.parent(), QWidget) else QWidget()
+        self.show_warning(parent, "Aviso", "Por favor, selecione um método de compressão antes de prosseguir.")
+
+    def show_integridade_warning(self):
+        parent = self.parent()if isinstance(self.parent(), QWidget) else QWidget()
+        self.show_warning(parent, "Aviso", "Por favor, selecione um arquivo para testar a integridade.")
+
+    def show_extension_warning(self):
+        parent = self.parent()if isinstance(self.parent(), QWidget) else QWidget()
+        self.show_warning(parent, "Aviso", "Por favor, selecione um arquivo RAR, ZIP, 7Z ou TAR para prosseguir.")
+
+    def show_extract_warning(self):
+        parent = self.parent() if isinstance(self.parent(), QWidget) else QWidget()
+        self.show_warning(parent, "Aviso", "Nenhum dos programas (WinRAR ou 7-Zip) encontrado. Por favor, instale um deles e tente novamente.")
+
+    def show_selection_compression_warning(self):
+        parent = self.parent()if isinstance(self.parent(), QWidget) else QWidget()
+        self.show_warning(parent, "Aviso", "Por favor, selecione uma pasta antes de prosseguir.")
+
+    def show_selection_descompression_warning(self):
+        parent = self.parent()if isinstance(self.parent(), QWidget) else QWidget()
+        self.show_warning(parent, "Aviso", "Por favor, selecione um arquivo antes de prosseguir.")
+
+    def show_selection_destination_warning(self):
+        parent = self.parent()if isinstance(self.parent(), QWidget) else QWidget()
+        self.show_warning(parent, "Aviso", "Por favor, selecione um diretório de saída antes de prosseguir.")
+
+    # Define um método chamado show_warning.
+    def show_warning(self, parent, title, message):
+        msg_box = QMessageBox(parent) # Cria uma nova instância da classe QMessageBox, passando a janela pai como argumento.
+        msg_box.setIcon(QMessageBox.Icon.Warning) # Define o ícone da caixa de mensagem como um ícone de aviso.
+        msg_box.setWindowTitle(title) # Define o título da caixa de mensagem como o título fornecido.
+        msg_box.setText(message) # Define o texto da caixa de mensagem como a mensagem fornecida.
+        apply_message_box_theme(msg_box) # Aplica o tema da caixa de mensagem.
+        msg_box.exec() # Exibe a caixa de mensagem.
+
+    # Define um método chamado apply_dialog_box_theme.
+    def apply_message_box_theme(self, msg_box):
+        apply_message_box_theme(msg_box) # Aplica o tema da caixa de mensagem.

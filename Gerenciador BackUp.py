@@ -3,7 +3,8 @@ import sys  # Importa o módulo sys
 import json  # Importa o módulo json
 # Importa as classes QApplication, QMainWindow, QVBoxLayout, QHBoxLayout, QLabel,
 # QListWidget, QPushButton, QWidget QMenu do módulo QtWidgets
-from PyQt6.QtWidgets import (QApplication, QMainWindow, QVBoxLayout, QHBoxLayout, QLabel, QListWidget, QPushButton, QWidget)
+from PyQt6.QtWidgets import (QApplication, QMainWindow, QVBoxLayout, QHBoxLayout, QLabel,
+                             QListWidget, QPushButton, QWidget, QStyleFactory)
 # Importa a classe Qt do módulo QtCore
 from PyQt6.QtCore import Qt
 # Importa a classe QAction do módulo QtGui
@@ -21,7 +22,7 @@ from Colors import apply_neutral_standart_theme_2
 # Define uma nova classe chamada InterfaceGrafica que herda de QMainWindow, uma classe do PyQt que representa uma janela.
 class InterfaceGrafica(QMainWindow, MetodoCompressao):
     def __init__(self):
-        super().__init__()
+        super(InterfaceGrafica, self).__init__()
         # Cria o gerenciador de interface
         self.gerenciador_interface = GerenciadorInterface(self)
 
@@ -46,6 +47,8 @@ class InterfaceGrafica(QMainWindow, MetodoCompressao):
 
         # Chama o método init_ui
         self.init_ui()
+        # Define o estilo da janela para Fusion
+        self.setStyle(QStyleFactory.create('Fusion'))
         # Chama e carrega o método de compressão
         self.load_compression_method()
 
@@ -61,9 +64,9 @@ class InterfaceGrafica(QMainWindow, MetodoCompressao):
             # Carrega o método de compressão do arquivo de configuração
             with open(caminho_metodo, 'r') as f:
                 config = json.load(f)
-                self.set_compression_method(False, config['compress_type_zip'], 'zip')
-                self.set_compression_method(False, config['compress_type_7z'], '7z')
-                self.set_compression_method(False, config['compress_type_tar'], 'tar')
+                self.set_compression_method(config['compress_type_zip'], 'zip')
+                self.set_compression_method(config['compress_type_7z'], '7z')
+                self.set_compression_method(config['compress_type_tar'], 'tar')
 
         # Verifica se o arquivo de configuração não existe
         except FileNotFoundError:

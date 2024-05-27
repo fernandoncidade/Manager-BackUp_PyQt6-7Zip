@@ -26,7 +26,7 @@ from Colors import (change_theme, apply_neutral_standart_theme, apply_light_them
 # Define uma nova classe chamada InterfaceGrafica que herda de QMainWindow, uma classe do PyQt que representa uma janela.
 class InterfaceGrafica(QMainWindow, MetodoCompressao):
     def __init__(self):
-        super().__init__()
+        super(InterfaceGrafica, self).__init__()
         # Cria o gerenciador de interface
         self.gerenciador_interface = GerenciadorInterface(self)
 
@@ -46,13 +46,11 @@ class InterfaceGrafica(QMainWindow, MetodoCompressao):
         self.compression_method_action.triggered.connect(self.select_compression_method)
             # Adicionar a ação ao menu
         self.config_menu.addAction(self.compression_method_action)
-
-        # Cria o menu de temas
-        self.themes_menu = QMenu('Temas', self)
-            # Adiciona o menu de temas ao menu de configurações
-        self.config_menu.addMenu(self.themes_menu)
             # Adiciona evento de entrada e saída para ativar o menu
         self.config_menu.aboutToShow.connect(self.select_compression_method)
+            # Cria o menu de temas
+            # Adiciona o menu de temas ao menu de configurações
+        self.theme_menu = self.config_menu.addMenu('Temas')
 
             # Define um dicionário de ações de tema
         themes = {
@@ -72,11 +70,11 @@ class InterfaceGrafica(QMainWindow, MetodoCompressao):
         for theme_name, theme_action in themes.items():
             action = QAction(theme_name, self)
             action.triggered.connect(theme_action)
-            self.themes_menu.addAction(action)
+            self.theme_menu.addAction(action)
 
         # Chama o método init_ui
         self.init_ui()
-        # Define o estilo da interface gráfica
+        # Define o estilo da janela
         self.setStyle(QStyleFactory.create('Fusion'))
         # Chama e carrega o método de compressão
         self.load_compression_method()
@@ -93,9 +91,9 @@ class InterfaceGrafica(QMainWindow, MetodoCompressao):
             # Carrega o método de compressão do arquivo de configuração
             with open(caminho_metodo, 'r') as f:
                 config = json.load(f)
-                self.set_compression_method(False, config['compress_type_zip'], 'zip')
-                self.set_compression_method(False, config['compress_type_7z'], '7z')
-                self.set_compression_method(False, config['compress_type_tar'], 'tar')
+                self.set_compression_method(config['compress_type_zip'], 'zip')
+                self.set_compression_method(config['compress_type_7z'], '7z')
+                self.set_compression_method(config['compress_type_tar'], 'tar')
 
         # Verifica se o arquivo de configuração não existe
         except FileNotFoundError:

@@ -4,6 +4,7 @@ import subprocess  # Importa o módulo subprocess
 # Importa a classe Qt do módulo QtCore
 from PyQt6.QtCore import QThread, pyqtSignal
 
+### AS LINHAS DE COMENTÁRIO SEMPRE FARÃO REFERÊNCIA A LINHA DE CÓDIGO QUE AS SUSCEDE, LOGO ABAIXO ###
 
 # Define a função de chamada, que busca o executável. Essa função não recebe nenhum argumento.
 def buscar_sevenzip_executavel():
@@ -45,15 +46,17 @@ class CompressaoZIP(QThread):
     #Esta linha define o método especial __init__, que é o construtor da classe.
     # Ele é chamado quando um novo objeto da classe é criado.
     # O construtor recebe vários parâmetros: sevenzip_executable, output_listbox, folder_listbox, compress_as_rar e compression_method.
-    def __init__(self, sevenzip_executable, output_listbox, folder_listbox, compress_as_zip=False, compression_method=None):
+    def __init__(self, sevenzip_executable, update_existing, output_listbox, folder_listbox, compress_as_zip=False, compression_method=None):
 
         # Esta linha chama o construtor da classe pai.
         # Ela garante que o construtor da classe pai seja executado antes do código no construtor da classe atual.
-        super().__init__()
+        super(CompressaoZIP, self).__init__()
+        self.format = "zip"
         # Esta linha atribui o valor do parâmetro sevenzip_executable ao atributo sevenzip_executable do objeto atual.
         # O atributo self.sevenzip_executable será usado posteriormente no código.
         # O mesmo vale para os outros atributos.
         self.sevenzip_executable = sevenzip_executable
+        self.update_existing = update_existing
         self.output_listbox = output_listbox
         self.folder_listbox = folder_listbox
         self.compress_as_zip = compress_as_zip
@@ -91,6 +94,8 @@ class CompressaoZIP(QThread):
                 # Aqui, uma string command é construída para representar o comando que será executado para comprimir a pasta.
                 # O comando inclui o executável do WinRAR, opções de compressão e os caminhos do arquivo comprimido e da pasta.
                 command = f'"{self.sevenzip_executable}" a -r -tzip -mx={self.compression_method} "{compressed_file_zip}" "{folder_path}"'
+                if self.update_existing:
+                    command = f'"{self.sevenzip_executable}" u -r -tzip -mx={self.compression_method} "{compressed_file_zip}" "{folder_path}"'
                 # Nesta linha, o comando construído anteriormente é executado usando o módulo subprocess.
                 # O parâmetro shell=True indica que o comando deve ser executado em um shell.
                 subprocess.run(command, shell=True)
@@ -105,10 +110,12 @@ class CompressaoZIP(QThread):
 class Compressao7Z(QThread):
     finished = pyqtSignal()
 
-    def __init__(self, sevenzip_executable, output_listbox, folder_listbox, compress_as_7z=False, compression_method=None):
+    def __init__(self, sevenzip_executable, update_existing, output_listbox, folder_listbox, compress_as_7z=False, compression_method=None):
 
-        super().__init__()
+        super(Compressao7Z, self).__init__()
+        self.format = "7z"
         self.sevenzip_executable = sevenzip_executable
+        self.update_existing = update_existing
         self.output_listbox = output_listbox
         self.folder_listbox = folder_listbox
         self.compress_as_7z = compress_as_7z
@@ -128,6 +135,8 @@ class Compressao7Z(QThread):
             for output_path in output_paths:
                 compressed_file_7z = os.path.join(output_path, f"{folder_name}.7z")
                 command = f'"{self.sevenzip_executable}" a -r -t7z -mx={self.compression_method} "{compressed_file_7z}" "{folder_path}"'
+                if self.update_existing:
+                    command = f'"{self.sevenzip_executable}" u -r -t7z -mx={self.compression_method} "{compressed_file_7z}" "{folder_path}"'
                 subprocess.run(command, shell=True)
                 compressed_files.append(compressed_file_7z)
 
@@ -137,10 +146,12 @@ class Compressao7Z(QThread):
 class CompressaoTAR(QThread):
     finished = pyqtSignal()
 
-    def __init__(self, sevenzip_executable, output_listbox, folder_listbox, compress_as_tar=False, compression_method=None):
+    def __init__(self, sevenzip_executable, update_existing, output_listbox, folder_listbox, compress_as_tar=False, compression_method=None):
 
-        super().__init__()
+        super(CompressaoTAR, self).__init__()
+        self.format = "tar"
         self.sevenzip_executable = sevenzip_executable
+        self.update_existing = update_existing
         self.output_listbox = output_listbox
         self.folder_listbox = folder_listbox
         self.compress_as_tar = compress_as_tar
@@ -160,10 +171,13 @@ class CompressaoTAR(QThread):
             for output_path in output_paths:
                 compressed_file_tar = os.path.join(output_path, f"{folder_name}.tar")
                 command = f'"{self.sevenzip_executable}" a -r -ttar "{compressed_file_tar}" "{folder_path}"'
+                if self.update_existing:
+                    command = f'"{self.sevenzip_executable}" u -r -ttar "{compressed_file_tar}" "{folder_path}"'
                 subprocess.run(command, shell=True)
                 compressed_files.append(compressed_file_tar)
 
         self.finished.emit()
+
 
 # Define uma nova classe chamada TesteIntegridade que herda de QThread, uma classe do PyQt que permite a criação de threads.
 class TesteIntegridade(QThread):
@@ -177,7 +191,7 @@ class TesteIntegridade(QThread):
     # compressed_files (uma lista de arquivos comprimidos para verificar).
     def __init__(self, sevenzip_executable, compressed_files):
         # Chama o método inicializador da classe pai (QThread), que é necessário para a correta inicialização da thread.
-        super().__init__()
+        super(TesteIntegridade, self).__init__()
         # Armazena o caminho para o executável do 7zip no objeto.
         self.sevenzip_executable = sevenzip_executable
         # Armazena a lista de arquivos comprimidos no objeto.
@@ -234,7 +248,7 @@ class Extracao(QThread):
     # e folder_listbox (um objeto ListBox que contém os caminhos dos arquivos a serem extraídos).
     def __init__(self, sevenzip_executable, output_listbox, folder_listbox):
         # Chama o método inicializador da classe pai (QThread), que é necessário para a correta inicialização da thread.
-        super().__init__()
+        super(Extracao, self).__init__()
         # Armazena o caminho para o executável do 7zip no objeto.
         self.sevenzip_executable = sevenzip_executable
         # Armazena o objeto ListBox que contém os caminhos de saída no objeto.

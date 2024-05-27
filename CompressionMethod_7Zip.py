@@ -5,6 +5,8 @@ import json  # Importa o módulo json
 from PyQt6.QtWidgets import QMenu
 # Importa a classe QAction do módulo QtGui
 from PyQt6.QtGui import QAction
+# Importa a classe partial do módulo functools
+from functools import partial
 # Importa a classe GerenciadorInterface do módulo ManagerInterface_7Zip
 from ManagerInterface_7Zip import GerenciadorInterface
 
@@ -54,7 +56,7 @@ class MetodoCompressao:
             # Crie uma ação para o método de compressão
             action = QAction(legends_sevenzip[method], self)
             # Conecte a ação a um método, passando o método de compressão como argumento
-            action.triggered.connect(lambda checked=False, method=method: self.set_compression_method(checked, method, 'zip'))
+            action.triggered.connect(partial(self.set_compression_method, method=method, compress_type='zip'))
             # Adicione a ação ao submenu do 7-Zip
             zip_submenu.addAction(action)
         # Adicione o submenu do 7-Zip ao menu de compressão
@@ -62,13 +64,13 @@ class MetodoCompressao:
 
         for method in seven_methods:
             action = QAction(legends_sevenzip[method], self)
-            action.triggered.connect(lambda checked=False, method=method: self.set_compression_method(checked, method, '7z'))
+            action.triggered.connect(partial(self.set_compression_method, method=method, compress_type='7z'))
             seven_submenu.addAction(action)
         compression_menu.addMenu(seven_submenu)
 
         for method in tar_methods:
             action = QAction(legends_sevenzip[method], self)
-            action.triggered.connect(lambda checked=False, method=method: self.set_compression_method(checked, method, 'tar'))
+            action.triggered.connect(partial(self.set_compression_method, method=method, compress_type='tar'))
             tar_submenu.addAction(action)
         compression_menu.addMenu(tar_submenu)
 
@@ -76,7 +78,7 @@ class MetodoCompressao:
         self.compression_method_action.setMenu(compression_menu)
 
     # Define um método chamado set_compression_method
-    def set_compression_method(self, checked, method, compress_type):
+    def set_compression_method(self, method, compress_type):
         # Busca o caminho do arquivo de configuração
         config_method = getattr(sys, '_MEIPASS', os.path.dirname(os.path.realpath(__file__)))
         config_path = os.path.join(config_method, "Config_Method")
@@ -114,9 +116,9 @@ class MetodoCompressao:
             # Carrega o método de compressão do arquivo de configuração
             with open(caminho_metodo, 'r') as f:
                 config = json.load(f)
-                self.set_compression_method(False, config['compress_type_zip'], 'zip')
-                self.set_compression_method(False, config['compress_type_7z'], '7z')
-                self.set_compression_method(False, config['compress_type_tar'], 'tar')
+                self.set_compression_method(config['compress_type_zip'], 'zip')
+                self.set_compression_method(config['compress_type_7z'], '7z')
+                self.set_compression_method(config['compress_type_tar'], 'tar')
                 
         # Verifica se o arquivo de configuração não existe
         except FileNotFoundError:
