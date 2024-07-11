@@ -1,10 +1,11 @@
 from PyQt6.QtWidgets import (QMainWindow, QListWidget, QFileDialog, QWidget, QTreeView, QMessageBox)
 from PyQt6.QtCore import QThread
 from queue import Queue
-from CompressionMotors_7Zip_v3 import (buscar_sevenzip_executavel,
-                                       CompressaoZIP, Compressao7Z, CompressaoTAR,
-                                       CompressaoBZip2, CompressaoGZip, CompressaoXZ,
-                                       CompressaoWIM, TesteIntegridade, Extracao)
+from CompressionMotors_7Zip_v3 import (buscar_sevenzip_executavel, buscar_bandizip_executavel,
+                                       CompressaoZIP, Compressao7Z, CompressaoBZip2, CompressaoTarXZ,
+                                       CompressaoTarGZ, CompressaoZIPX, CompressaoTGZ, CompressaoLZH,
+                                       CompressaoISO, CompressaoTAR, CompressaoWIM,
+                                       TesteIntegridade, Extracao)
 
 
 class GerenciadorInterface(QThread, QMainWindow):
@@ -14,31 +15,45 @@ class GerenciadorInterface(QThread, QMainWindow):
         self.compress_queue = Queue()
         self.compress_thread_zip = None
         self.compress_thread_7z = None
-        self.compress_thread_tar = None
-        self.compress_thread_gzip = None
         self.compress_thread_bzip2 = None
-        self.compress_thread_xz = None
+        self.compress_thread_zipx = None
+        self.compress_thread_tarxz = None
+        self.compress_thread_tgz = None
+        self.compress_thread_targz = None
+        self.compress_thread_lzh = None
+        self.compress_thread_iso = None
+        self.compress_thread_tar = None
         self.compress_thread_wim = None
         self.compression_method_zip = None
         self.compression_method_7z = None
-        self.compression_method_tar = None
-        self.compression_method_gzip = None
         self.compression_method_bzip2 = None
-        self.compression_method_xz = None
+        self.compression_method_zipx = None
+        self.compression_method_tarxz = None
+        self.compression_method_tgz = None
+        self.compression_method_targz = None
+        self.compression_method_lzh = None
+        self.compression_method_iso = None
+        self.compression_method_tar = None
         self.compression_method_wim = None
         self.update_existing = None
-        self.sevenzip_executable = buscar_sevenzip_executavel()
 
-        if not self.sevenzip_executable:
-            print("7-Zip não encontrado. Por favor, instale antes e tente novamente.")
+        self.sevenzip_executable = buscar_sevenzip_executavel()
+        self.bandizip_executable = buscar_bandizip_executavel()
+
+        if not self.sevenzip_executable and not self.bandizip_executable:
+            print("Nenhum dos programas (7-Zip ou Bandizip) encontrado. Por favor, instale um deles e tente novamente.")
             exit(1)
 
         self.output_listbox_zip = QListWidget()
         self.output_listbox_7z = QListWidget()
-        self.output_listbox_tar = QListWidget()
-        self.output_listbox_gzip = QListWidget()
         self.output_listbox_bzip2 = QListWidget()
-        self.output_listbox_xz = QListWidget()
+        self.output_listbox_zipx = QListWidget()
+        self.output_listbox_tarxz = QListWidget()
+        self.output_listbox_tgz = QListWidget()
+        self.output_listbox_targz = QListWidget()
+        self.output_listbox_lzh = QListWidget()
+        self.output_listbox_iso = QListWidget()
+        self.output_listbox_tar = QListWidget()
         self.output_listbox_wim = QListWidget()
         self.output_listbox = QListWidget()
         self.folder_listbox = QListWidget()
@@ -52,25 +67,37 @@ class GerenciadorInterface(QThread, QMainWindow):
         self.compress_thread_7z = Compressao7Z(self.sevenzip_executable, self.update_existing, self.output_listbox, self.folder_listbox)
         self.compress_thread_7z.finished.connect(self.on_compress_finished)
 
-        self.compress_thread_tar = CompressaoTAR(self.sevenzip_executable, self.update_existing, self.output_listbox, self.folder_listbox)
-        self.compress_thread_tar.finished.connect(self.on_compress_finished)
-
-        self.compress_thread_gzip = CompressaoGZip(self.sevenzip_executable, self.update_existing, self.output_listbox, self.folder_listbox)
-        self.compress_thread_gzip.finished.connect(self.on_compress_finished)
-
         self.compress_thread_bzip2 = CompressaoBZip2(self.sevenzip_executable, self.update_existing, self.output_listbox, self.folder_listbox)
         self.compress_thread_bzip2.finished.connect(self.on_compress_finished)
 
-        self.compress_thread_xz = CompressaoXZ(self.sevenzip_executable, self.update_existing, self.output_listbox, self.folder_listbox)
-        self.compress_thread_xz.finished.connect(self.on_compress_finished)
+        self.compress_thread_zipx = CompressaoZIPX(self.bandizip_executable, self.update_existing, self.output_listbox, self.folder_listbox)
+        self.compress_thread_zipx.finished.connect(self.on_compress_finished)
+
+        self.compress_thread_tarxz = CompressaoTarXZ(self.bandizip_executable, self.update_existing, self.output_listbox, self.folder_listbox)
+        self.compress_thread_tarxz.finished.connect(self.on_compress_finished)
+
+        self.compress_thread_tgz = CompressaoTGZ(self.bandizip_executable, self.update_existing, self.output_listbox, self.folder_listbox)
+        self.compress_thread_tgz.finished.connect(self.on_compress_finished)
+
+        self.compress_thread_targz = CompressaoTarGZ(self.bandizip_executable, self.update_existing, self.output_listbox, self.folder_listbox)
+        self.compress_thread_targz.finished.connect(self.on_compress_finished)
+
+        self.compress_thread_lzh = CompressaoLZH(self.bandizip_executable, self.update_existing, self.output_listbox, self.folder_listbox)
+        self.compress_thread_lzh.finished.connect(self.on_compress_finished)
+
+        self.compress_thread_iso = CompressaoISO(self.bandizip_executable, self.update_existing, self.output_listbox, self.folder_listbox)
+        self.compress_thread_iso.finished.connect(self.on_compress_finished)
+
+        self.compress_thread_tar = CompressaoTAR(self.sevenzip_executable, self.update_existing, self.output_listbox, self.folder_listbox)
+        self.compress_thread_tar.finished.connect(self.on_compress_finished)
 
         self.compress_thread_wim = CompressaoWIM(self.sevenzip_executable, self.update_existing, self.output_listbox, self.folder_listbox)
         self.compress_thread_wim.finished.connect(self.on_compress_finished)
 
-        self.teste_integridade_thread = TesteIntegridade(self.sevenzip_executable, self.compressed_files)
+        self.teste_integridade_thread = TesteIntegridade(self.sevenzip_executable, self.bandizip_executable, self.compressed_files)
         self.teste_integridade_thread.finished.connect(self.on_teste_integridade_finished)
 
-        self.extract_thread = Extracao(self.sevenzip_executable, self.output_listbox, self.folder_listbox)
+        self.extract_thread = Extracao(self.sevenzip_executable, self.bandizip_executable, self.output_listbox, self.folder_listbox)
         self.extract_thread.finished.connect(self.on_extract_finished)
 
     def browse_folder(self, main_window):
@@ -143,10 +170,14 @@ class GerenciadorInterface(QThread, QMainWindow):
             self.output_listbox.addItems(selected_output)
             self.output_listbox_zip.addItems(selected_output)
             self.output_listbox_7z.addItems(selected_output)
-            self.output_listbox_tar.addItems(selected_output)
-            self.output_listbox_gzip.addItems(selected_output)
             self.output_listbox_bzip2.addItems(selected_output)
-            self.output_listbox_xz.addItems(selected_output)
+            self.output_listbox_zipx.addItems(selected_output)
+            self.output_listbox_tarxz.addItems(selected_output)
+            self.output_listbox_tgz.addItems(selected_output)
+            self.output_listbox_targz.addItems(selected_output)
+            self.output_listbox_lzh.addItems(selected_output)
+            self.output_listbox_iso.addItems(selected_output)
+            self.output_listbox_tar.addItems(selected_output)
             self.output_listbox_wim.addItems(selected_output)
             self.output_listbox_extract.addItems(selected_output)
 
@@ -154,10 +185,14 @@ class GerenciadorInterface(QThread, QMainWindow):
         self.output_listbox.clear()
         self.output_listbox_zip.clear()
         self.output_listbox_7z.clear()
-        self.output_listbox_tar.clear()
-        self.output_listbox_gzip.clear()
         self.output_listbox_bzip2.clear()
-        self.output_listbox_xz.clear()
+        self.output_listbox_zipx.clear()
+        self.output_listbox_tarxz.clear()
+        self.output_listbox_tgz.clear()
+        self.output_listbox_targz.clear()
+        self.output_listbox_lzh.clear()
+        self.output_listbox_iso.clear()
+        self.output_listbox_tar.clear()
         self.output_listbox_wim.clear()
         self.output_listbox_extract.clear()
 
@@ -167,17 +202,29 @@ class GerenciadorInterface(QThread, QMainWindow):
     def clear_output_listbox_7z(self):
         self.output_listbox_7z.clear()
 
-    def clear_output_listbox_tar(self):
-        self.output_listbox_tar.clear()
-
-    def clear_output_listbox_gzip(self):
-        self.output_listbox_gzip.clear()
-
     def clear_output_listbox_bzip2(self):
         self.output_listbox_bzip2.clear()
 
-    def clear_output_listbox_xz(self):
-        self.output_listbox_xz.clear()
+    def clear_output_listbox_zipx(self):
+        self.output_listbox_zipx.clear()
+
+    def clear_output_listbox_tarxz(self):
+        self.output_listbox_tarxz.clear()
+
+    def clear_output_listbox_tgz(self):
+        self.output_listbox_tgz.clear()
+
+    def clear_output_listbox_targz(self):
+        self.output_listbox_targz.clear()
+
+    def clear_output_listbox_lzh(self):
+        self.output_listbox_lzh.clear()
+
+    def clear_output_listbox_iso(self):
+        self.output_listbox_iso.clear()
+
+    def clear_output_listbox_tar(self):
+        self.output_listbox_tar.clear()
 
     def clear_output_listbox_wim(self):
         self.output_listbox_wim.clear()
@@ -212,18 +259,30 @@ class GerenciadorInterface(QThread, QMainWindow):
 
     def output_button_output_7Z_clicked(self):
         self.select_output_path(self.output_listbox_7z, self.main_window)
-
-    def output_button_output_TAR_clicked(self):
-        self.select_output_path(self.output_listbox_tar, self.main_window)
-
-    def output_button_output_GZIP_clicked(self):
-        self.select_output_path(self.output_listbox_gzip, self.main_window)
     
     def output_button_output_BZIP2_clicked(self):
         self.select_output_path(self.output_listbox_bzip2, self.main_window)
-    
-    def output_button_output_XZ_clicked(self):
-        self.select_output_path(self.output_listbox_xz, self.main_window)
+
+    def output_button_output_ZIPX_clicked(self):
+        self.select_output_path(self.output_listbox_zipx, self.main_window)
+
+    def output_button_output_TarXZ_clicked(self):
+        self.select_output_path(self.output_listbox_tarxz, self.main_window)
+
+    def output_button_output_TGZ_clicked(self):
+        self.select_output_path(self.output_listbox_tgz, self.main_window)
+
+    def output_button_output_TarGZ_clicked(self):
+        self.select_output_path(self.output_listbox_targz, self.main_window)
+
+    def output_button_output_LZH_clicked(self):
+        self.select_output_path(self.output_listbox_lzh, self.main_window)
+
+    def output_button_output_ISO_clicked(self):
+        self.select_output_path(self.output_listbox_iso, self.main_window)
+
+    def output_button_output_TAR_clicked(self):
+        self.select_output_path(self.output_listbox_tar, self.main_window)
     
     def output_button_output_WIM_clicked(self):
         self.select_output_path(self.output_listbox_wim, self.main_window)
@@ -266,42 +325,6 @@ class GerenciadorInterface(QThread, QMainWindow):
 
         else:
             self.show_method_warning()
-
-    def store_as_tar(self):
-        if self.folder_listbox.count() == 0:
-            self.show_selection_compression_warning()
-
-        elif self.output_listbox_tar.count() == 0:
-            self.show_selection_destination_warning()
-
-        elif self.compression_method_tar is not None:
-            new_compress_thread = CompressaoTAR(
-                self.sevenzip_executable, self.update_existing, self.output_listbox_tar, self.folder_listbox,
-                compress_as_tar=True, compression_method=self.compression_method_tar
-            )
-            new_compress_thread.finished.connect(self.on_compress_finished)
-            self.start_compression_thread(new_compress_thread)
-
-        else:
-            self.show_method_warning()
-    
-    def store_as_gzip(self):
-        if self.folder_listbox.count() == 0:
-            self.show_selection_compression_warning()
-
-        elif self.output_listbox_gzip.count() == 0:
-            self.show_selection_destination_warning()
-
-        elif self.compression_method_gzip is not None:
-            new_compress_thread = CompressaoGZip(
-                self.sevenzip_executable, self.update_existing, self.output_listbox_gzip, self.folder_listbox,
-                compress_as_gzip=True, compression_method=self.compression_method_gzip
-            )
-            new_compress_thread.finished.connect(self.on_compress_finished)
-            self.start_compression_thread(new_compress_thread)
-
-        else:
-            self.show_method_warning()
         
     def store_as_bzip2(self):
         if self.folder_listbox.count() == 0:
@@ -320,18 +343,126 @@ class GerenciadorInterface(QThread, QMainWindow):
 
         else:
             self.show_method_warning()
-    
-    def store_as_xz(self):
+
+    def store_as_zipx(self):
         if self.folder_listbox.count() == 0:
             self.show_selection_compression_warning()
 
-        elif self.output_listbox_xz.count() == 0:
+        elif self.output_listbox_zipx.count() == 0:
             self.show_selection_destination_warning()
 
-        elif self.compression_method_xz is not None:
-            new_compress_thread = CompressaoXZ(
-                self.sevenzip_executable, self.update_existing, self.output_listbox_xz, self.folder_listbox,
-                compress_as_xz=True, compression_method=self.compression_method_xz
+        elif self.compression_method_zipx is not None:
+            new_compress_thread = CompressaoZIPX(
+                self.bandizip_executable, self.update_existing, self.output_listbox_zipx, self.folder_listbox,
+                compress_as_zipx=True, compression_method=self.compression_method_zipx
+            )
+            new_compress_thread.finished.connect(self.on_compress_finished)
+            self.start_compression_thread(new_compress_thread)
+
+        else:
+            self.show_method_warning()
+
+    def store_as_tarxz(self):
+        if self.folder_listbox.count() == 0:
+            self.show_selection_compression_warning()
+
+        elif self.output_listbox_tarxz.count() == 0:
+            self.show_selection_destination_warning()
+
+        elif self.compression_method_tarxz is not None:
+            new_compress_thread = CompressaoTarXZ(
+                self.bandizip_executable, self.update_existing, self.output_listbox_tarxz, self.folder_listbox,
+                compress_as_tarxz=True, compression_method=self.compression_method_tarxz
+            )
+            new_compress_thread.finished.connect(self.on_compress_finished)
+            self.start_compression_thread(new_compress_thread)
+
+        else:
+            self.show_method_warning()
+
+    def store_as_tgz(self):
+        if self.folder_listbox.count() == 0:
+            self.show_selection_compression_warning()
+
+        elif self.output_listbox_tgz.count() == 0:
+            self.show_selection_destination_warning()
+
+        elif self.compression_method_tgz is not None:
+            new_compress_thread = CompressaoTGZ(
+                self.bandizip_executable, self.update_existing, self.output_listbox_tgz, self.folder_listbox,
+                compress_as_tgz=True, compression_method=self.compression_method_tgz
+            )
+            new_compress_thread.finished.connect(self.on_compress_finished)
+            self.start_compression_thread(new_compress_thread)
+
+        else:
+            self.show_method_warning()
+    
+    def store_as_targz(self):
+        if self.folder_listbox.count() == 0:
+            self.show_selection_compression_warning()
+
+        elif self.output_listbox_targz.count() == 0:
+            self.show_selection_destination_warning()
+
+        elif self.compression_method_targz is not None:
+            new_compress_thread = CompressaoTarGZ(
+                self.bandizip_executable, self.update_existing, self.output_listbox_targz, self.folder_listbox,
+                compress_as_targz=True, compression_method=self.compression_method_targz
+            )
+            new_compress_thread.finished.connect(self.on_compress_finished)
+            self.start_compression_thread(new_compress_thread)
+
+        else:
+            self.show_method_warning()
+
+    def store_as_lzh(self):
+        if self.folder_listbox.count() == 0:
+            self.show_selection_compression_warning()
+
+        elif self.output_listbox_lzh.count() == 0:
+            self.show_selection_destination_warning()
+
+        elif self.compression_method_lzh is not None:
+            new_compress_thread = CompressaoLZH(
+                self.bandizip_executable, self.update_existing, self.output_listbox_lzh, self.folder_listbox,
+                compress_as_lzh=True, compression_method=self.compression_method_lzh
+            )
+            new_compress_thread.finished.connect(self.on_compress_finished)
+            self.start_compression_thread(new_compress_thread)
+
+        else:
+            self.show_method_warning()
+
+    def store_as_iso(self):
+        if self.folder_listbox.count() == 0:
+            self.show_selection_compression_warning()
+
+        elif self.output_listbox_iso.count() == 0:
+            self.show_selection_destination_warning()
+
+        elif self.compression_method_iso is not None:
+            new_compress_thread = CompressaoISO(
+                self.bandizip_executable, self.update_existing, self.output_listbox_iso, self.folder_listbox,
+                compress_as_iso=True, compression_method=self.compression_method_iso
+            )
+            new_compress_thread.finished.connect(self.on_compress_finished)
+            self.start_compression_thread(new_compress_thread)
+
+        else:
+            self.show_method_warning()
+
+    def store_as_tar(self):
+        if self.folder_listbox.count() == 0:
+            self.show_selection_compression_warning()
+
+        elif self.output_listbox_tar.count() == 0:
+            self.show_selection_destination_warning()
+
+        elif self.compression_method_tar is not None:
+            new_compress_thread = CompressaoTAR(
+                self.sevenzip_executable, self.update_existing, self.output_listbox_tar, self.folder_listbox,
+                compress_as_tar=True, compression_method=self.compression_method_tar
             )
             new_compress_thread.finished.connect(self.on_compress_finished)
             self.start_compression_thread(new_compress_thread)
@@ -364,14 +495,19 @@ class GerenciadorInterface(QThread, QMainWindow):
             if item is not None:
                 selected_files.append(item.text())
 
-        compressed_files = [file for file in selected_files if file.lower().endswith(('.rar', '.zip', '.7z', '.tar', '.gz', '.bz2', '.xz', '.wim'))]
+        compressed_files = [file for file in selected_files if file.lower().endswith(('.zip', '.7z', '.tar.bz2', '.zipx', '.tar.xz', '.tgz', '.tar.gz', '.lzh', '.iso', '.tar', '.wim'))]
 
         if not compressed_files:
             self.show_extension_warning()
             return
 
         if self.sevenzip_executable and compressed_files:
-            self.teste_integridade_thread = TesteIntegridade(self.sevenzip_executable, compressed_files)
+            self.teste_integridade_thread = TesteIntegridade(self.sevenzip_executable, self.bandizip_executable, compressed_files)
+            self.teste_integridade_thread.finished.connect(self.on_teste_integridade_finished)
+            self.teste_integridade_thread.start()
+
+        elif self.bandizip_executable and compressed_files:
+            self.teste_integridade_thread = TesteIntegridade(self.bandizip_executable, self.sevenzip_executable, compressed_files)
             self.teste_integridade_thread.finished.connect(self.on_teste_integridade_finished)
             self.teste_integridade_thread.start()
 
@@ -386,7 +522,12 @@ class GerenciadorInterface(QThread, QMainWindow):
             self.show_selection_destination_warning()
 
         elif self.sevenzip_executable:
-            self.extract_thread = Extracao(self.sevenzip_executable, self.output_listbox_extract, self.folder_listbox)
+            self.extract_thread = Extracao(self.sevenzip_executable, self.bandizip_executable, self.output_listbox_extract, self.folder_listbox)
+            self.extract_thread.finished.connect(self.on_extract_finished)
+            self.extract_thread.start()
+            
+        elif self.bandizip_executable:
+            self.extract_thread = Extracao(self.bandizip_executable, self.sevenzip_executable, self.output_listbox_extract, self.folder_listbox)
             self.extract_thread.finished.connect(self.on_extract_finished)
             self.extract_thread.start()
 
@@ -447,11 +588,11 @@ class GerenciadorInterface(QThread, QMainWindow):
 
     def show_extension_warning(self):
         parent = self.parent()if isinstance(self.parent(), QWidget) else QWidget()
-        self.show_warning(parent, "Aviso", "Por favor, selecione um arquivo RAR, ZIP, 7Z ou TAR para prosseguir.")
+        self.show_warning(parent, "Aviso", "Por favor, selecione um arquivo ZIP, 7Z, TAR.BZ2, ZIPX, TAR.XZ, TGZ, TAR.GZ, LZH, ISO, TAR ou WIM para prosseguir.")
 
     def show_extract_warning(self):
         parent = self.parent() if isinstance(self.parent(), QWidget) else QWidget()
-        self.show_warning(parent, "Aviso", "Nenhum dos programas (WinRAR ou 7-Zip) encontrado. Por favor, instale um deles e tente novamente.")
+        self.show_warning(parent, "Aviso", "Nenhum dos programas (7-Zip ou BAndiZip) encontrado. Por favor, instale um deles e tente novamente.")
 
     def show_selection_compression_warning(self):
         parent = self.parent()if isinstance(self.parent(), QWidget) else QWidget()

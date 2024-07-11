@@ -27,6 +27,28 @@ def buscar_sevenzip_executavel():
     return None
 
 
+def buscar_bandizip_executavel():
+    dir_atual = getattr(sys, '_MEIPASS', os.path.dirname(os.path.realpath(__file__)))
+
+    bandizip_path = os.path.join(dir_atual, "Bandizip")
+
+    caminho_bandizip = os.path.join(bandizip_path, 'Bandizip.exe')
+
+    if os.path.exists(caminho_bandizip):
+        return caminho_bandizip
+    
+    possible_locations = [
+        rf"C:\Program Files\Bandizip\Bandizip.exe",
+        rf"C:\Program Files (x86)\Bandizip\Bandizip.exe",
+    ]
+
+    for location in possible_locations:
+        if os.path.isfile(location):
+            return location
+        
+    return None
+
+
 class CompressaoZIP(QThread):
     finished = pyqtSignal()
 
@@ -105,58 +127,6 @@ class Compressao7Z(QThread):
         self.finished.emit()
 
 
-class CompressaoGZip(QThread):
-    finished = pyqtSignal()
-
-    def __init__(self, sevenzip_executable, update_existing, output_listbox, folder_listbox,
-                 compress_as_gzip=False, compression_method=None):
-        
-        super(CompressaoGZip, self).__init__()
-        self.format = "gz"
-        self.sevenzip_executable = sevenzip_executable
-        self.update_existing = update_existing
-        self.output_listbox = output_listbox
-        self.folder_listbox = folder_listbox
-        self.compress_as_gzip = compress_as_gzip
-        self.compression_method = compression_method
-
-    def run(self):
-        output_paths = [self.output_listbox.item(idx).text() for idx in range(self.output_listbox.count())]
-        if not output_paths:
-            return
-
-        compressed_files = []
-
-        for idx in range(self.folder_listbox.count()):
-            folder_path = self.folder_listbox.item(idx).text()
-            folder_name = os.path.basename(folder_path)
-
-            for output_path in output_paths:
-                try:
-                    with tempfile.TemporaryDirectory() as temp_dir:
-                        temp_tar_path = os.path.join(temp_dir, f"{folder_name}.tar")
-                        compressed_file_gz = os.path.join(output_path, f"{folder_name}.tar.gz")
-
-                        tar_command = [self.sevenzip_executable, "a", "-r", "-ttar", temp_tar_path, folder_path]
-                        subprocess.run(tar_command, check=True)
-
-                        if self.compress_as_gzip:
-                            gz_command = [self.sevenzip_executable, "a", "-r", "-tgzip", f"-mx={self.compression_method}", compressed_file_gz, temp_tar_path]
-                            subprocess.run(gz_command, check=True)
-                            os.remove(temp_tar_path)
-
-                        elif self.update_existing:
-                            update_command = [self.sevenzip_executable, "u", "-r", "-tgzip", f"-mx={self.compression_method}", compressed_file_gz, folder_path]
-                            subprocess.run(update_command, check=True)
-
-                        compressed_files.append(compressed_file_gz)
-
-                except (PermissionError, subprocess.CalledProcessError) as e:
-                    print(f"Erro ao processar {folder_path}: {e}")
-
-        self.finished.emit()
-
-
 class CompressaoBZip2(QThread):
     finished = pyqtSignal()
 
@@ -164,7 +134,7 @@ class CompressaoBZip2(QThread):
                  compress_as_bzip2=False, compression_method=None):
         
         super(CompressaoBZip2, self).__init__()
-        self.format = "bz2"
+        self.format = "tar.bz2"
         self.sevenzip_executable = sevenzip_executable
         self.update_existing = update_existing
         self.output_listbox = output_listbox
@@ -190,16 +160,16 @@ class CompressaoBZip2(QThread):
                         compressed_file_bz2 = os.path.join(output_path, f"{folder_name}.tar.bz2")
 
                         tar_command = [self.sevenzip_executable, "a", "-r", "-ttar", temp_tar_path, folder_path]
-                        subprocess.run(tar_command, check=True)
+                        subprocess.run(tar_command, shell=True)
 
                         if self.compress_as_bzip2:
-                            bz2_command = [self.sevenzip_executable, "a", "-r", "-tbzip2", f"-mx={self.compression_method}", compressed_file_bz2, temp_tar_path]
-                            subprocess.run(bz2_command, check=True)
+                            command = [self.sevenzip_executable, "a", "-r", "-tbzip2", f"-mx={self.compression_method}", compressed_file_bz2, temp_tar_path]
+                            subprocess.run(command, shell=True)
                             os.remove(temp_tar_path)
 
                         elif self.update_existing:
-                            update_command = [self.sevenzip_executable, "u", "-r", "-tbzip2", f"-mx={self.compression_method}", compressed_file_bz2, folder_path]
-                            subprocess.run(update_command, check=True)
+                            command = [self.sevenzip_executable, "u", "-r", "-tbzip2", f"-mx={self.compression_method}", compressed_file_bz2, folder_path]
+                            subprocess.run(command, shell=True)
 
                         compressed_files.append(compressed_file_bz2)
 
@@ -209,20 +179,20 @@ class CompressaoBZip2(QThread):
         self.finished.emit()
 
 
-class CompressaoXZ(QThread):
+class CompressaoZIPX(QThread):
     finished = pyqtSignal()
 
-    def __init__(self, sevenzip_executable, update_existing, output_listbox, folder_listbox,
-                 compress_as_xz=False, compression_method=None):
-        
-        super(CompressaoXZ, self).__init__()
-        self.format = "xz"
-        self.sevenzip_executable = sevenzip_executable
-        self.update_existing = update_existing
-        self.output_listbox = output_listbox
-        self.folder_listbox = folder_listbox
-        self.compress_as_xz = compress_as_xz
-        self.compression_method = compression_method
+    def __init__(self, bandizip_executable, update_existing, output_listbox, folder_listbox,
+                 compress_as_zipx=False, compression_method=None):
+            
+            super(CompressaoZIPX, self).__init__()
+            self.format = "zipx"
+            self.bandizip_executable = bandizip_executable
+            self.update_existing = update_existing
+            self.output_listbox = output_listbox
+            self.folder_listbox = folder_listbox
+            self.compress_as_zipx = compress_as_zipx
+            self.compression_method = compression_method
 
     def run(self):
         output_paths = [self.output_listbox.item(idx).text() for idx in range(self.output_listbox.count())]
@@ -236,27 +206,235 @@ class CompressaoXZ(QThread):
             folder_name = os.path.basename(folder_path)
 
             for output_path in output_paths:
+                compressed_file_zipx = os.path.join(output_path, f"{folder_name}.zipx")
+                command = f'"{self.bandizip_executable}" c -fmt:zipx -r -y -l:{self.compression_method} -storeroot:yes "{compressed_file_zipx}" "{folder_path}"'
+
+                if self.update_existing:
+                    command = f'"{self.bandizip_executable}" a -fmt:zipx -r -l:{self.compression_method} -storeroot:yes "{compressed_file_zipx}" "{folder_path}"'
+
+                subprocess.run(command, shell=True)
+                compressed_files.append(compressed_file_zipx)
+
+        self.finished.emit()
+
+
+class CompressaoTarXZ(QThread):
+    finished = pyqtSignal()
+
+    def __init__(self, bandizip_executable, update_existing, output_listbox, folder_listbox,
+                 compress_as_tarxz=False, compression_method=None):
+        
+        super(CompressaoTarXZ, self).__init__()
+        self.format = "tar.xz"
+        self.bandizip_executable = bandizip_executable
+        self.update_existing = update_existing
+        self.output_listbox = output_listbox
+        self.folder_listbox = folder_listbox
+        self.compress_as_tarxz = compress_as_tarxz
+        self.compression_method = compression_method
+
+    def run(self):
+        output_paths = [self.output_listbox.item(idx).text() for idx in range(self.output_listbox.count())]
+        if not output_paths:
+            return
+        
+        compressed_files = []
+
+        for idx in range(self.folder_listbox.count()):
+            folder_path = self.folder_listbox.item(idx).text()
+            folder_name = os.path.basename(folder_path)
+
+            for output_path in output_paths:
                 try:
                     with tempfile.TemporaryDirectory() as temp_dir:
                         temp_tar_path = os.path.join(temp_dir, f"{folder_name}.tar")
-                        compressed_file_xz = os.path.join(output_path, f"{folder_name}.tar.xz")
+                        compressed_file_tarxz = os.path.join(output_path, f"{folder_name}.tar.xz")
 
-                        tar_command = [self.sevenzip_executable, "a", "-r", "-ttar", temp_tar_path, folder_path]
-                        subprocess.run(tar_command, check=True)
+                        tar_command = [self.bandizip_executable, "c", '-fmt:tar', "-r", '-y', f'-l:{self.compression_method}', '-storeroot:yes', temp_tar_path, folder_path]
+                        subprocess.run(tar_command, shell=True)
 
-                        if self.compress_as_xz:
-                            xz_command = [self.sevenzip_executable, "a", "-r", "-txz", f"-mx={self.compression_method}", compressed_file_xz, temp_tar_path]
-                            subprocess.run(xz_command, check=True)
+                        if self.compress_as_tarxz:
+                            command = [self.bandizip_executable, 'c', '-fmt:xz', '-r', '-y', f'-l:{self.compression_method}', '-storeroot:yes', compressed_file_tarxz, temp_tar_path]
+                            subprocess.run(command, shell=True)
                             os.remove(temp_tar_path)
 
                         elif self.update_existing:
-                            update_command = [self.sevenzip_executable, "u", "-r", "-txz", f"-mx={self.compression_method}", compressed_file_xz, folder_path]
-                            subprocess.run(update_command, check=True)
+                            command = [self.bandizip_executable, 'a', '-fmt:xz', '-r', '-y', f'-l:{self.compression_method}', '-storeroot:yes', compressed_file_tarxz, folder_path]
+                            subprocess.run(command, shell=False)
 
-                        compressed_files.append(compressed_file_xz)
+                        compressed_files.append(compressed_file_tarxz)
 
                 except (PermissionError, subprocess.CalledProcessError) as e:
                     print(f"Erro ao processar {folder_path}: {e}")
+        
+        self.finished.emit()
+
+
+class CompressaoTGZ(QThread):
+    finished = pyqtSignal()
+
+    def __init__(self, bandizip_executable, update_existing, output_listbox, folder_listbox,
+                 compress_as_tgz=False, compression_method=None):
+    
+            super(CompressaoTGZ, self).__init__()
+            self.format = "tgz"
+            self.bandizip_executable = bandizip_executable
+            self.update_existing = update_existing
+            self.output_listbox = output_listbox
+            self.folder_listbox = folder_listbox
+            self.compress_as_tgz = compress_as_tgz
+            self.compression_method = compression_method
+
+    def run(self):
+        output_paths = [self.output_listbox.item(idx).text() for idx in range(self.output_listbox.count())]
+        if not output_paths:
+            return
+
+        compressed_files = []
+
+        for idx in range(self.folder_listbox.count()):
+            folder_path = self.folder_listbox.item(idx).text()
+            folder_name = os.path.basename(folder_path)
+
+            for output_path in output_paths:
+                compressed_file_tgz = os.path.join(output_path, f"{folder_name}.tgz")
+                command = f'"{self.bandizip_executable}" c -fmt:tgz -r -y -l:{self.compression_method} -storeroot:yes "{compressed_file_tgz}" "{folder_path}"'
+
+                if self.update_existing:
+                    command = f'"{self.bandizip_executable}" a -fmt:tgz -r -l:{self.compression_method} -storeroot:yes "{compressed_file_tgz}" "{folder_path}"'
+
+                subprocess.run(command, shell=True)
+                compressed_files.append(compressed_file_tgz)
+
+        self.finished.emit()
+
+
+class CompressaoTarGZ(QThread):
+    finished = pyqtSignal()
+
+    def __init__(self, bandizip_executable, update_existing, output_listbox, folder_listbox,
+                 compress_as_targz=False, compression_method=None):
+        
+        super(CompressaoTarGZ, self).__init__()
+        self.format = "tar.gz"
+        self.bandizip_executable = bandizip_executable
+        self.update_existing = update_existing
+        self.output_listbox = output_listbox
+        self.folder_listbox = folder_listbox
+        self.compress_as_targz = compress_as_targz
+        self.compression_method = compression_method
+
+    def run(self):
+        output_paths = [self.output_listbox.item(idx).text() for idx in range(self.output_listbox.count())]
+        if not output_paths:
+            return
+        
+        compressed_files = []
+
+        for idx in range(self.folder_listbox.count()):
+            folder_path = self.folder_listbox.item(idx).text()
+            folder_name = os.path.basename(folder_path)
+
+            for output_path in output_paths:
+                try:
+                    with tempfile.TemporaryDirectory() as temp_dir:
+                        temp_tar_path = os.path.join(temp_dir, f"{folder_name}.tar")
+                        compressed_file_targz = os.path.join(output_path, f"{folder_name}.tar.gz")
+
+                        tar_command = [self.bandizip_executable, "c", '-fmt:tar', "-r", '-y', f'-l:{self.compression_method}', '-storeroot:yes', temp_tar_path, folder_path]
+                        subprocess.run(tar_command, shell=True)
+
+                        if self.compress_as_targz:
+                            command = [self.bandizip_executable, 'c', '-fmt:gz', '-r', '-y', f'-l:{self.compression_method}', '-storeroot:yes', compressed_file_targz, temp_tar_path]
+                            subprocess.run(command, shell=True)
+                            os.remove(temp_tar_path)
+
+                        elif self.update_existing:
+                            command = [self.bandizip_executable, 'a', '-fmt:gz', '-r', '-y', f'-l:{self.compression_method}', '-storeroot:yes', compressed_file_targz, folder_path]
+                            subprocess.run(command, shell=False)
+
+                        compressed_files.append(compressed_file_targz)
+
+                except (PermissionError, subprocess.CalledProcessError) as e:
+                    print(f"Erro ao processar {folder_path}: {e}")
+        
+        self.finished.emit()
+
+
+class CompressaoLZH(QThread):
+    finished = pyqtSignal()
+
+    def __init__(self, bandizip_executable, update_existing, output_listbox, folder_listbox,
+                 compress_as_lzh=False, compression_method=None):
+            
+            super(CompressaoLZH, self).__init__()
+            self.format = "lzh"
+            self.bandizip_executable = bandizip_executable
+            self.update_existing = update_existing
+            self.output_listbox = output_listbox
+            self.folder_listbox = folder_listbox
+            self.compress_as_lzh = compress_as_lzh
+            self.compression_method = compression_method
+
+    def run(self):
+        output_paths = [self.output_listbox.item(idx).text() for idx in range(self.output_listbox.count())]
+        if not output_paths:
+            return
+
+        compressed_files = []
+
+        for idx in range(self.folder_listbox.count()):
+            folder_path = self.folder_listbox.item(idx).text()
+            folder_name = os.path.basename(folder_path)
+
+            for output_path in output_paths:
+                compressed_file_lzh = os.path.join(output_path, f"{folder_name}.lzh")
+                command = f'"{self.bandizip_executable}" c -fmt:lzh -r -y -l:{self.compression_method} -storeroot:yes "{compressed_file_lzh}" "{folder_path}"'
+
+                if self.update_existing:
+                    command = f'"{self.bandizip_executable}" a -fmt:lzh -r -l:{self.compression_method} -storeroot:yes "{compressed_file_lzh}" "{folder_path}"'
+
+                subprocess.run(command, shell=True)
+                compressed_files.append(compressed_file_lzh)
+
+        self.finished.emit()
+
+
+class CompressaoISO(QThread):
+    finished = pyqtSignal()
+
+    def __init__(self, bandizip_executable, update_existing, output_listbox, folder_listbox,
+                 compress_as_iso=False, compression_method=None):
+                
+                super(CompressaoISO, self).__init__()
+                self.format = "iso"
+                self.bandizip_executable = bandizip_executable
+                self.update_existing = update_existing
+                self.output_listbox = output_listbox
+                self.folder_listbox = folder_listbox
+                self.compress_as_iso = compress_as_iso
+                self.compression_method = compression_method
+
+    def run(self):
+        output_paths = [self.output_listbox.item(idx).text() for idx in range(self.output_listbox.count())]
+        if not output_paths:
+            return
+
+        compressed_files = []
+
+        for idx in range(self.folder_listbox.count()):
+            folder_path = self.folder_listbox.item(idx).text()
+            folder_name = os.path.basename(folder_path)
+
+            for output_path in output_paths:
+                compressed_file_iso = os.path.join(output_path, f"{folder_name}.iso")
+                command = f'"{self.bandizip_executable}" c -fmt:iso -r -y -l:{self.compression_method} -storeroot:yes "{compressed_file_iso}" "{folder_path}"'
+
+                if self.update_existing:
+                    command = f'"{self.bandizip_executable}" a -fmt:iso -r -l:{self.compression_method} -storeroot:yes "{compressed_file_iso}" "{folder_path}"'
+
+                subprocess.run(command, shell=True)
+                compressed_files.append(compressed_file_iso)
 
         self.finished.emit()
 
@@ -338,13 +516,15 @@ class CompressaoWIM(QThread):
 
         self.finished.emit()
 
+
 class TesteIntegridade(QThread):
     finished = pyqtSignal()
 
-    def __init__(self, sevenzip_executable, compressed_files):
+    def __init__(self, sevenzip_executable, bandizip_executable, compressed_files):
 
         super(TesteIntegridade, self).__init__()
         self.sevenzip_executable = sevenzip_executable
+        self.bandizip_executable = bandizip_executable
         self.compressed_files = compressed_files
 
     def run(self):
@@ -367,18 +547,6 @@ class TesteIntegridade(QThread):
                 result = subprocess.run(command, shell=True, check=True)
                 if result.returncode != 0:
                     raise Exception("A verificação da integridade do arquivo falhou")
-
-            elif compressed_file.endswith(".tar"):
-                command = f'"{self.sevenzip_executable}" t "{compressed_file}"'
-                result = subprocess.run(command, shell=True, check=True)
-                if result.returncode != 0:
-                    raise Exception("A verificação da integridade do arquivo falhou")
-                
-            elif compressed_file.endswith(".gz"):
-                command = f'"{self.sevenzip_executable}" t "{compressed_file}"'
-                result = subprocess.run(command, shell=True, check=True)
-                if result.returncode != 0:
-                    raise Exception("A verificação da integridade do arquivo falhou")
             
             elif compressed_file.endswith(".bz2"):
                 command = f'"{self.sevenzip_executable}" t "{compressed_file}"'
@@ -386,7 +554,43 @@ class TesteIntegridade(QThread):
                 if result.returncode != 0:
                     raise Exception("A verificação da integridade do arquivo falhou")
             
-            elif compressed_file.endswith(".xz"):
+            elif compressed_file.endswith(".tar.xz"):
+                command = f'"{self.bandizip_executable}" t "{compressed_file}"'
+                result = subprocess.run(command, shell=True, check=True)
+                if result.returncode != 0:
+                    raise Exception("A verificação da integridade do arquivo falhou")
+                
+            elif compressed_file.endswith(".zipx"):
+                command = f'"{self.bandizip_executable}" t "{compressed_file}"'
+                result = subprocess.run(command, shell=True, check=True)
+                if result.returncode != 0:
+                    raise Exception("A verificação da integridade do arquivo falhou")
+                
+            elif compressed_file.endswith(".tgz"):
+                command = f'"{self.bandizip_executable}" t "{compressed_file}"'
+                result = subprocess.run(command, shell=True, check=True)
+                if result.returncode != 0:
+                    raise Exception("A verificação da integridade do arquivo falhou")
+                
+            elif compressed_file.endswith(".tar.gz"):
+                command = f'"{self.bandizip_executable}" t "{compressed_file}"'
+                result = subprocess.run(command, shell=True, check=True)
+                if result.returncode != 0:
+                    raise Exception("A verificação da integridade do arquivo falhou")
+                
+            elif compressed_file.endswith(".lzh"):
+                command = f'"{self.bandizip_executable}" t "{compressed_file}"'
+                result = subprocess.run(command, shell=True, check=True)
+                if result.returncode != 0:
+                    raise Exception("A verificação da integridade do arquivo falhou")
+                
+            elif compressed_file.endswith(".iso"):
+                command = f'"{self.bandizip_executable}" t "{compressed_file}"'
+                result = subprocess.run(command, shell=True, check=True)
+                if result.returncode != 0:
+                    raise Exception("A verificação da integridade do arquivo falhou")
+
+            elif compressed_file.endswith(".tar"):
                 command = f'"{self.sevenzip_executable}" t "{compressed_file}"'
                 result = subprocess.run(command, shell=True, check=True)
                 if result.returncode != 0:
@@ -404,10 +608,12 @@ class TesteIntegridade(QThread):
 class Extracao(QThread):
     finished = pyqtSignal()
 
-    def __init__(self, sevenzip_executable, output_listbox, folder_listbox):
+    def __init__(self, sevenzip_executable, bandizip_executable,
+                 output_listbox, folder_listbox):
         
         super(Extracao, self).__init__()
         self.sevenzip_executable = sevenzip_executable
+        self.bandizip_executable = bandizip_executable
         self.output_listbox = output_listbox
         self.folder_listbox = folder_listbox
 
@@ -421,7 +627,7 @@ class Extracao(QThread):
 
             for output_path in output_paths:
                 if archive_path.endswith(".rar"):
-                    command = f'"{self.sevenzip_executable}" x -y "{archive_path}" -o"{output_path}"'
+                    command = f'"{self.sevenzip_executable}" x -y "{archive_path}" "{output_path}"'
                     subprocess.run(command, shell=True)
 
                 elif archive_path.endswith(".zip"):
@@ -431,20 +637,56 @@ class Extracao(QThread):
                 elif archive_path.endswith(".7z"):
                     command = f'"{self.sevenzip_executable}" x -y "{archive_path}" -o"{output_path}"'
                     subprocess.run(command, shell=True)
-
-                elif archive_path.endswith(".tar"):
-                    command = f'"{self.sevenzip_executable}" x -y "{archive_path}" -o"{output_path}"'
-                    subprocess.run(command, shell=True)
-                
-                elif archive_path.endswith(".gz"):
-                    command = f'"{self.sevenzip_executable}" x -y "{archive_path}" -o"{output_path}"'
-                    subprocess.run(command, shell=True)
                 
                 elif archive_path.endswith(".bz2"):
-                    command = f'"{self.sevenzip_executable}" x -y "{archive_path}" -o"{output_path}"'
-                    subprocess.run(command, shell=True)
+                    with tempfile.TemporaryDirectory() as temp_dir:
+                        temp_tar_path = os.path.join(temp_dir, os.path.basename(archive_path).replace('.bz2', ''))
+                        command = f'"{self.sevenzip_executable}" x -y "{archive_path}" -o"{temp_dir}"'
+                        subprocess.run(command, shell=True)
+                        
+                        command = f'"{self.sevenzip_executable}" x -y "{temp_tar_path}" -o"{output_path}"'
+                        subprocess.run(command, shell=True)
                 
-                elif archive_path.endswith(".xz"):
+                elif archive_path.endswith(".tar.xz"):
+                    with tempfile.TemporaryDirectory() as temp_dir:
+                        temp_tar_path = os.path.join(temp_dir, os.path.basename(archive_path).replace('.xz', ''))
+                        command = f'"{self.bandizip_executable}" x -o:"{temp_dir}" "{archive_path}"'
+                        subprocess.run(command, shell=True)
+                        
+                        command = f'"{self.bandizip_executable}" x -o:"{output_path}" "{temp_tar_path}"'
+                        subprocess.run(command, shell=True)
+
+                elif archive_path.endswith(".zipx"):
+                    command = f'"{self.bandizip_executable}" x -o:"{output_path}" "{archive_path}"'
+                    subprocess.run(command, shell=True)
+
+                elif archive_path.endswith(".tgz"):
+                    with tempfile.TemporaryDirectory() as temp_dir:
+                        temp_tar_path = os.path.join(temp_dir, os.path.basename(archive_path).replace('.tgz', '.tar'))
+                        command = f'"{self.bandizip_executable}" x -o:"{temp_dir}" "{archive_path}"'
+                        subprocess.run(command, shell=True)
+                        
+                        command = f'"{self.bandizip_executable}" x -o:"{output_path}" "{temp_tar_path}"'
+                        subprocess.run(command, shell=True)
+
+                elif archive_path.endswith(".tar.gz"):
+                    with tempfile.TemporaryDirectory() as temp_dir:
+                        temp_tar_path = os.path.join(temp_dir, os.path.basename(archive_path).replace('.gz', ''))
+                        command = f'"{self.bandizip_executable}" x -o:"{temp_dir}" "{archive_path}"'
+                        subprocess.run(command, shell=True)
+                        
+                        command = f'"{self.bandizip_executable}" x -o:"{output_path}" "{temp_tar_path}"'
+                        subprocess.run(command, shell=True)
+
+                elif archive_path.endswith(".lzh"):
+                    command = f'"{self.bandizip_executable}" x -o:"{output_path}" "{archive_path}"'
+                    subprocess.run(command, shell=True)
+
+                elif archive_path.endswith(".iso"):
+                    command = f'"{self.bandizip_executable}" x -o:"{output_path}" "{archive_path}"'
+                    subprocess.run(command, shell=True)
+
+                elif archive_path.endswith(".tar"):
                     command = f'"{self.sevenzip_executable}" x -y "{archive_path}" -o"{output_path}"'
                     subprocess.run(command, shell=True)
                 
