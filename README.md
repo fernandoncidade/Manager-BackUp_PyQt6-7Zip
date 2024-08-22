@@ -28,6 +28,7 @@ Este projeto é uma aplicação de interface gráfica (GUI) desenvolvida em Pyth
 ## Instalação
 
 1. Clone o repositório:
+   ```bash
    git clone https://github.com/fernandoncidade/Manager-BackUp_PyQt6-7Zip
    cd Manager-BackUp_PyQt6-7Zip
    ```
@@ -149,4 +150,3 @@ INFORMAÇÕES EXTRAS SOBRE A LICENÇA:
 
   --
   Igor Pavlov
-  
