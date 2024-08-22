@@ -34,15 +34,18 @@ Este projeto é uma aplicação de interface gráfica (GUI) desenvolvida em Pyth
    ```
 
 2. Crie um ambiente virtual (opcional, mas recomendado):
+   ```bash
    python -m venv venv
    source venv/bin/activate  # No Windows use `venv\Scripts\activate`
    ```
 
 3. Instale as dependências:
+   ```bash
    pip install -r requirements.txt
    ```
 
 4. Execute a aplicação:
+   ```bash
    python Gerenciador_BackUp_7Zip_Standart_v3.py
    ```
 
