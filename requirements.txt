@@ -1,0 +1,9 @@
+backports.tarfile==1.2.0
+importlib-metadata==8.0.0
+importlib-resources==6.4.0
+jaraco.collections==5.1.0
+pip-chill==1.0.3
+platformdirs==4.2.2
+pyinstaller==6.10.0
+pyqt6==6.7.1
+tomli==2.0.1
