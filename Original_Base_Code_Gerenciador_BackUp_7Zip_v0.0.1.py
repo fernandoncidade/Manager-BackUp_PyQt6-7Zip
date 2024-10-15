@@ -108,7 +108,7 @@ class CompressaoZIP(QThread):
                 compressed_files.append(compressed_file_zip)
 
         # Por fim, o sinal finished é emitido.
-        # Isso indica que o método run foi concluído e pode ser usado para notificar outros componentes ou partes do código sobre o término da execução.
+        # Isso indica que o metodo run foi concluído e pode ser usado para notificar outros componentes ou partes do código sobre o término da execução.
         self.finished.emit()
 
 
